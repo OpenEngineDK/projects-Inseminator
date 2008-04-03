@@ -12,17 +12,18 @@
 
 #include <Renderers/IRenderNode.h>
 #include "HUDisplay.h"
-#include <Resources/MovieResource.h>
+#include <Resources/IMovieResource.h>
 
 using OpenEngine::Scene::IRenderNode;
 using OpenEngine::Renderers::IRenderer;
+using namespace OpenEngine::Resources;
 
 class HUDMovie : public HUDisplay {
 private:
-    MovieResource* mplayer;
+    IMovieResourcePtr mplayer;
 
 public:
-    HUDMovie(MovieResource* mplayer);
+    HUDMovie(IMovieResourcePtr mplayer);
     ~HUDMovie();
 
     // Only for processing the movie decoding

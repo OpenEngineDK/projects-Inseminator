@@ -57,7 +57,7 @@ public:
         keyUp   = new Listener<NeedleHandler, KeyboardEventArg> (*this, &NeedleHandler::KeyUp);
 
         // Load Needle model
-        IModelResourcePtr mod = ResourceManager::CreateModel("Needle.obj");
+        IModelResourcePtr mod = ResourceManager<IModelResource>::Create("Needle.obj");
         mod->Load();
         if( mod->GetFaceSet() == NULL )
             logger.error << "Loading needle obj file failed - FaceSet is empty!" << logger.end;

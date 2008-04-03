@@ -43,9 +43,9 @@ public:
 
         // Load texture
         ITextureResourcePtr texture =
-	  ResourceManager::CreateTexture("MicroHUD.tga"); 
+	  ResourceManager<ITextureResource>::Create("MicroHUD.tga"); 
 	TextureLoader::LoadTextureResource(texture);
-        hud = new HUDisplay(texture->GetID());
+        hud = new HUDisplay(texture);
         hud->Blend(true);
         root->AddNode(hud);
     }

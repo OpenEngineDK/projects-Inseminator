@@ -27,13 +27,15 @@ public:
     ~PictureState() {}
 
     virtual void Initialize() {
-        mouse = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
+        mouse = dynamic_cast<IMouse*>(IGameEngine::Instance()
+				      .Lookup(typeid(IMouse)));
         initMouseState = mouse->GetState();
 
         // Load texture
-        ITextureResourcePtr texture = ResourceManager::CreateTexture(pictureName); 
+        ITextureResourcePtr texture =
+	  ResourceManager<ITextureResource>::Create(pictureName); 
 	TextureLoader::LoadTextureResource(texture);
-        hud = new HUDisplay(texture->GetID());
+        hud = new HUDisplay(texture);
 
         HUDState::Initialize();
     }

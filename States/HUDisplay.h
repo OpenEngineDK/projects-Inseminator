@@ -12,22 +12,22 @@
 
 #include <Renderers/IRenderNode.h>
 #include <Renderers/IRenderingView.h>
+#include <Resources/ITextureResource.h>
 
-#include <Resources/MovieResource.h>
-
+using namespace OpenEngine::Resources;
 using namespace OpenEngine::Renderers;
-
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 600;
 
 class HUDisplay : public IRenderNode {
 protected:
-  bool hasInitialized, endRequested, blend, reverseTexture;
+    int SCREEN_WIDTH;
+    int SCREEN_HEIGHT;
+
+    bool hasInitialized, endRequested, blend, reverseTexture;
     int textureId;
     float fade, maxX, maxY;
 public:
-    HUDisplay();
-    HUDisplay(int textureId);
+    HUDisplay(unsigned int width, unsigned int height);
+    HUDisplay(ITextureResourcePtr texture);
     ~HUDisplay();
 
     void Apply(IRenderingView* rende);

@@ -11,12 +11,17 @@
 #include <Meta/OpenGL.h>
 #include <Logging/Logger.h>
 
-HUDisplay::HUDisplay() : textureId(0) {
+HUDisplay::HUDisplay(unsigned int width, unsigned int height) : textureId(0) {
+  SCREEN_WIDTH = width; // = 1280;
+    SCREEN_HEIGHT = height; // = 600;
     hasInitialized = false;
     fade = 1.0f;
 }
 
-HUDisplay::HUDisplay(int textureId) : textureId(textureId), fade(1.0f) {
+HUDisplay::HUDisplay(ITextureResourcePtr texture) : fade(1.0f) {
+    SCREEN_WIDTH = texture->GetWidth(); // = 1280;
+    SCREEN_HEIGHT = texture->GetHeight(); // = 600;
+    textureId = texture->GetID();
     reverseTexture = false;
     hasInitialized = false;
     endRequested = false;

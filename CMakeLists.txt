@@ -37,8 +37,9 @@ TARGET_LINK_LIBRARIES (${PROJECT_NAME}
  		       ${OPENGL_LIBRARY}
 		       ${GLEW_LIBRARY}
   # Extension dependencies
+  Extensions_SDL
   Extensions_StateManager
   Extensions_MediPhysics
-  Extensions_MovieResource
+  Extensions_FFMPEGResource
   Extensions_GLScreenshot
  )

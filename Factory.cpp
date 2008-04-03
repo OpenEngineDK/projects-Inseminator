@@ -24,7 +24,8 @@
 #include <Utils/Convert.h>
 
 // from extensions
-#include <Resources/MovieResource.h>
+#include <Resources/IMovieResource.h>
+#include <Resources/FFMPEGResource.h>
 #include <Utils/MoveHandler.h>
 #include <Utils/QuitHandler.h>
 #include <Utils/Billboard.h>
@@ -47,16 +48,14 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 	string resourcedir = "./projects/Inseminator/data/";
 	logger.info << "Resource directory: " << resourcedir << logger.end;
 	string modeldir = resourcedir + "models/";
-	ResourceManager::AppendPath(modeldir);
-
-	/* MovieStates need the full path the movie files, because
-	   MovieResource does not use the ResourceManager to load */
+	DirectoryManager::AppendPath(modeldir);
 	string videodir = resourcedir + "videos/";
-
+	DirectoryManager::AppendPath(videodir);
 
         // load the resource plug-ins
-        ResourceManager::AddModelPlugin(new OBJPlugin());
-        ResourceManager::AddTexturePlugin(new TGAPlugin());
+        ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
+        ResourceManager<ITextureResource>::AddPlugin(new TGAPlugin());
+	ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
 
         // Create scene root
         ISceneNode* root = new InitGLNode();
@@ -80,23 +79,23 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 	  ("Intro.tga", "IntroState");
         // 1. Intro (Video)
         MovieState* introState = new MovieState
-	  (videodir + "Intro.mov", "DonateTextState");
+	  ("Intro.mov", "DonateTextState");
 
         // 2. "Morten has Donated" (Video)
         MovieState* donateTextState = new MovieState
-	  (videodir + "DonateText.mov", "DonateState");
+	  ("DonateText.mov", "DonateState");
 
         // 3.
         MovieState* donateState = new MovieState
-	  (videodir + "Donate.mov", "HitTheLittleGuyText1");
+	  ("Donate.mov", "HitTheLittleGuyText1");
 
         // 4.
         MovieState* hitText1 = new MovieState
-	  (videodir + "HitTheLittleGuyText1.mov", "HitTheLittleGuyText2");
+	  ("HitTheLittleGuyText1.mov", "HitTheLittleGuyText2");
 
         // 5.
         MovieState* hitText2 = new MovieState
-	  (videodir + "HitTheLittleGuyText2.mov", "HitTheLittleGuyState");
+	  ("HitTheLittleGuyText2.mov", "HitTheLittleGuyState");
 
 
         // 3. "Hit The Little Guy" (Simulator)
@@ -107,11 +106,11 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 
         // 4. Successfully accomplished (Video) 
         MovieState* hitSuccessState = new MovieState
-	  (videodir + "HitTheLittleGuySuccess.mov", "SelectTheLittleGuyText");
+	  ("HitTheLittleGuySuccess.mov", "SelectTheLittleGuyText");
 
         // 
         MovieState* selectText = new MovieState
-	  (videodir + "SelectTheLittleGuyText.mov", "SelectTheLittleGuyState");
+	  ("SelectTheLittleGuyText.mov", "SelectTheLittleGuyState");
 
         // 5. "Select The Little Guy" (Simulator)
         SelectState* selectState = new SelectState
@@ -122,11 +121,11 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 
         // 6. Successfully accomplished (Video)
         MovieState* selectSuccessState = new MovieState
-	  (videodir + "SelectTheLittleGuySuccess.mov", "TurnTheEggText");
+	  ("SelectTheLittleGuySuccess.mov", "TurnTheEggText");
 
         //
         MovieState* turnText = new MovieState
-	  (videodir + "TurnTheEggText.mov", "TurnTheEggState");
+	  ("TurnTheEggText.mov", "TurnTheEggState");
 
         // 7. "Turn The Egg" (Simulator)
         TurnTheEggState* turnState = new TurnTheEggState
@@ -136,11 +135,11 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 
         // 8. Successfully accomplished (Video) 
         MovieState* turnSuccessState = new MovieState
-	  (videodir + "TurnTheEggSuccess.mov", "InseminationText");
+	  ("TurnTheEggSuccess.mov", "InseminationText");
 
         // 9. Insemination (Simulator)
         MovieState* inseminateText = new MovieState
-	  (videodir + "InseminationText.mov", "InseminationState");
+	  ("InseminationText.mov", "InseminationState");
 
         // 10. "Insemination" (Simulator)
         InseminateState* inseminateState = new InseminateState
@@ -150,11 +149,11 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 
         // 11. Successfully accomplished (Video)
         MovieState* inseminateSuccessState = new MovieState
-	  (videodir + "InseminationSuccess.mov", "Outro");
+	  ("InseminationSuccess.mov", "Outro");
 
         // 12. Outro (Video)
         MovieState* outro = new MovieState
-	  (videodir + "Outro.mov", "StartupPicture", true);
+	  ("Outro.mov", "StartupPicture", true);
 
 
 

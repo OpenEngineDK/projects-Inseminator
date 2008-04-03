@@ -1,6 +1,8 @@
 #include "HUDMovie.h"
 
-HUDMovie::HUDMovie(MovieResource* movie) : mplayer(movie) {
+HUDMovie::HUDMovie(IMovieResourcePtr movie) :
+  HUDisplay(movie->GetMovieWidth(),movie->GetMovieHeight()) {
+    mplayer = movie;
     reverseTexture = true;
 
     blend = false;

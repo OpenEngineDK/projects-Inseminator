@@ -19,7 +19,8 @@ private:
 
 public:
  MovieState(string movieName, string nextState, bool restart = false) : HUDState(nextState, restart) {
-        MovieResource* mplayer = new MovieResource(movieName, false);
+        IMovieResourcePtr mplayer = 
+	  ResourceManager<IMovieResource>::Create(movieName);
         movie = new HUDMovie(mplayer);
 	hud = movie;
     }
