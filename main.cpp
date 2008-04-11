@@ -7,13 +7,17 @@
 // See the GNU General Public License for more details (see LICENSE). 
 //--------------------------------------------------------------------
 
+// OpenEngine stuff
+#include <Meta/Config.h>
+
+#include "Factory.h"
+
 #include <Logging/Logger.h>
 #include <Logging/StreamLogger.h>
 
 #include <Core/GameEngine.h>
 
-#include "Meta/GLUT.h"//TEMP ONLY FOR DRAWING WIRED SPHERE IN MediPhysic
-#include "Factory.h"
+#include <Meta/GLUT.h> //TEMP ONLY FOR DRAWING WIRED SPHERE IN MediPhysic
 
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Logging;
@@ -30,7 +34,10 @@ int main( int argc, char** argv ) {
     // Start the engine.
     IGameEngine& engine = GameEngine::Instance();
     engine.SetTickTime(20); // for the MediPhysic to work properly
-    engine.Start(new Factory);
+
+    Factory* factory = new Factory();
+    engine.Start(factory);
+    delete factory;
 
     // Return when the engine stops.
     return EXIT_SUCCESS;

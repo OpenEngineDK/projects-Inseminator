@@ -13,33 +13,30 @@ SET( PROJECT_SOURCES
      States/Spermatozoa.cpp
 )
 
+# Include needed to use SDL under Mac OS X
+IF(APPLE)
+  SET(PROJECT_SOURCES ${PROJECT_SOURCES} ${SDL_MAIN_FOR_MAC})
+ENDIF(APPLE)
+
 # Project executable
 ADD_EXECUTABLE(${PROJECT_NAME}
   ${PROJECT_SOURCES}
 )
 
-# Include needed to use SDL under Mac OS X
-IF(APPLE)
-  SET(PROJECT_SOURCES ${PROJECT_SOURCES} ../../conf/mac/SDLMain.m)
-ENDIF(APPLE)
-
-TARGET_LINK_LIBRARIES (${PROJECT_NAME}
- 		       OpenEngine_Core
-		       OpenEngine_Display
-		       OpenEngine_Resources
-		       OpenEngine_Scene
-		       OpenEngine_Logging
-		       OpenEngine_Devices
-		       OpenEngine_Scene
-		       OpenEngine_Utils
-		       OpenEngine_Geometry
-		       OpenEngine_Renderers_OpenGL
- 		       ${OPENGL_LIBRARY}
-		       ${GLEW_LIBRARY}
+TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
+  OpenEngine_Core
+  OpenEngine_Display
+  OpenEngine_Resources
+  OpenEngine_Scene
+  OpenEngine_Logging
+  OpenEngine_Devices
+  OpenEngine_Geometry
+  OpenEngine_Renderers_OpenGL
   # Extension dependencies
+  Extensions_OpenGLRenderer
   Extensions_SDL
   Extensions_StateManager
   Extensions_MediPhysics
   Extensions_FFMPEGResource
-  Extensions_GLScreenshot
+#  Extensions_GLScreenshot
  )

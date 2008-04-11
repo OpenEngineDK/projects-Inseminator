@@ -1,3 +1,14 @@
+//------------------- Settings ----------------------------
+//static const int FRAME_WIDTH = 1680, FRAME_HEIGHT = 1050;
+//static const int FRAME_WIDTH = 1440, FRAME_HEIGHT = 900;
+static const int FRAME_WIDTH = 770, FRAME_HEIGHT = 450;
+
+static const bool FULLSCREEN = false;
+//static const bool FULLSCREEN = true;
+
+static const int RESET_TIME = 20000; // in milli seconds
+//---------------------------------------------------------
+
 #include "Factory.h"
 
 #include "InitGLNode.h"
@@ -12,16 +23,18 @@
 #include "States/PictureState.h"
 #include "States/NeedleHandler.h"
 
-#include <Core/IGameFactory.h>
 #include <Display/ViewingVolume.h>
 #include <Display/SDLFrame.h>
 #include <Display/Camera.h>
 #include <Devices/SDLInput.h>
+
 #include <Renderers/OpenGL/Renderer.h>
 #include <Renderers/OpenGL/RenderingView.h>
+
+#include <Resources/DirectoryManager.h>
+#include <Resources/ResourceManager.h>
 #include <Resources/OBJResource.h>
 #include <Resources/TGAResource.h>
-#include <Utils/Convert.h>
 
 // from extensions
 #include <Resources/IMovieResource.h>
@@ -29,7 +42,7 @@
 #include <Utils/MoveHandler.h>
 #include <Utils/QuitHandler.h>
 #include <Utils/Billboard.h>
-#include <GLScreenshot.h>
+//#include <GLScreenshot.h>
 #include <MediPhysic.h>
 
 using namespace OpenEngine::Display;
@@ -37,7 +50,6 @@ using namespace OpenEngine::Devices;
 using namespace OpenEngine::Scene;
 using namespace OpenEngine::Renderers::OpenGL;
 using namespace OpenEngine::Resources;
-using namespace OpenEngine::Utils;
 
 bool Factory::SetupEngine(IGameEngine& engine) {
     try {
@@ -58,100 +70,99 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 	ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
 
         // Create scene root
-        ISceneNode* root = new InitGLNode();
+	ISceneNode* root = new InitGLNode();
         this->renderer->SetSceneRoot(root);
 
-
         // Create MediPhysic module handling the sphere (Eeg)
-        MediPhysic* physic = new MediPhysic(modeldir);
+	MediPhysic* physic = new MediPhysic(modeldir);
 	/* MediPhysics needs the full path to resources because
 	   it does not use the ResourceManager to load models and textures */
-
 
         // Create needle handler
         NeedleHandler* needleHandler = new NeedleHandler(physic, root);
         physic->needle = needleHandler->GetTransformationNode();
+
         // Add noisy floating textures to the background
         Background* bg = new Background("Background.tga");
 
-        // 0. Start up picture
+        // 01. Start up picture
 	PictureState* startup = new PictureState
 	  ("Intro.tga", "IntroState");
-        // 1. Intro (Video)
+
+        // 02. Intro (Video)
         MovieState* introState = new MovieState
 	  ("Intro.mov", "DonateTextState");
 
-        // 2. "Morten has Donated" (Video)
+        // 03. "Morten has Donated" (Video)
         MovieState* donateTextState = new MovieState
 	  ("DonateText.mov", "DonateState");
 
-        // 3.
+        // 04.
         MovieState* donateState = new MovieState
 	  ("Donate.mov", "HitTheLittleGuyText1");
 
-        // 4.
+        // 05.
         MovieState* hitText1 = new MovieState
 	  ("HitTheLittleGuyText1.mov", "HitTheLittleGuyText2");
 
-        // 5.
+        // 06.
         MovieState* hitText2 = new MovieState
 	  ("HitTheLittleGuyText2.mov", "HitTheLittleGuyState");
 
-
-        // 3. "Hit The Little Guy" (Simulator)
+        // 07. "Hit The Little Guy" (Simulator)
         HitTheLittleGuyState* hitState = new HitTheLittleGuyState
 	  ("HitTheLittleGuySuccessState");
         hitState->SetNeedle(needleHandler);
         hitState->SetBackground(bg);
 
-        // 4. Successfully accomplished (Video) 
+        // 08. Successfully accomplished (Video) 
         MovieState* hitSuccessState = new MovieState
 	  ("HitTheLittleGuySuccess.mov", "SelectTheLittleGuyText");
 
-        // 
+        // 09.
         MovieState* selectText = new MovieState
 	  ("SelectTheLittleGuyText.mov", "SelectTheLittleGuyState");
 
-        // 5. "Select The Little Guy" (Simulator)
+        // 10. "Select The Little Guy" (Simulator)
         SelectState* selectState = new SelectState
 	  ("SelectTheLittleGuySuccessState");
         selectState->SetNeedle(needleHandler);
         selectState->SetBackground(bg);
         selectState->SetSpermatozoaList(hitState->GetSpermatozoaList());
 
-        // 6. Successfully accomplished (Video)
+        // 11. Successfully accomplished (Video)
         MovieState* selectSuccessState = new MovieState
 	  ("SelectTheLittleGuySuccess.mov", "TurnTheEggText");
 
-        //
+        // 12.
         MovieState* turnText = new MovieState
 	  ("TurnTheEggText.mov", "TurnTheEggState");
 
-        // 7. "Turn The Egg" (Simulator)
+        // 13. "Turn The Egg" (Simulator)
         TurnTheEggState* turnState = new TurnTheEggState
 	  ("TurnTheEggSuccessState", physic);
         turnState->SetNeedle(needleHandler);
         turnState->SetBackground(bg);
 
-        // 8. Successfully accomplished (Video) 
+        // 14. Successfully accomplished (Video) 
         MovieState* turnSuccessState = new MovieState
 	  ("TurnTheEggSuccess.mov", "InseminationText");
 
-        // 9. Insemination (Simulator)
+        // 15. Insemination (Simulator)
         MovieState* inseminateText = new MovieState
 	  ("InseminationText.mov", "InseminationState");
 
-        // 10. "Insemination" (Simulator)
+        // 16. "Insemination" (Simulator)
         InseminateState* inseminateState = new InseminateState
 	  ("InseminationSuccessState", physic);
         inseminateState->SetNeedle(needleHandler);
         inseminateState->SetBackground(bg);
 
-        // 11. Successfully accomplished (Video)
+        // 17. Successfully accomplished (Video)
         MovieState* inseminateSuccessState = new MovieState
 	  ("InseminationSuccess.mov", "Outro");
 
-        // 12. Outro (Video)
+        // 18. Outro (Video)
         MovieState* outro = new MovieState
 	  ("Outro.mov", "StartupPicture", true);
 
@@ -190,13 +201,13 @@ bool Factory::SetupEngine(IGameEngine& engine) {
         TimedQuitEventHandler* tquit_h = new TimedQuitEventHandler(RESET_TIME);
 	tquit_h->RegisterWithEngine(engine);
 
-	GLScreenshot* sshot_h = new GLScreenshot(resourcedir + "screenshots/");
-	sshot_h->RegisterWithEngine(engine);
-
         QuitHandler* quit_h = new QuitHandler();
 	quit_h->BindToEventSystem();
 
 	/*
+	GLScreenshot* sshot_h = new GLScreenshot(resourcedir + "screenshots/");
+	sshot_h->RegisterWithEngine(engine);
+
 	// Register the handler as a listener on up and down keyboard events.
         MoveHandler* move = new MoveHandler(*camera);
 	move->RegisterWithEngine(engine);
@@ -223,9 +234,15 @@ Factory::Factory() {
     camera->LookAt(Vector<3,float>(3,0,0));
     viewport->SetViewingVolume(camera);
       
-    Renderer* renderer = new Renderer();
+    renderer = new Renderer();
     renderer->AddRenderingView(new RenderingView(*viewport));
-    this->renderer = renderer;
+}
+
+Factory::~Factory() {
+  delete frame;
+  delete renderer;
+  delete viewport;
+  delete camera;
 }
 
 IFrame* Factory::GetFrame() { return frame; }

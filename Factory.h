@@ -10,20 +10,15 @@
 #ifndef _FACTORY_H_
 #define _FACTORY_H_
 
-//------------------- Settings ----------------------------
-//static const int FRAME_WIDTH = 1680, FRAME_HEIGHT = 1050;
-//static const int FRAME_WIDTH = 1440, FRAME_HEIGHT = 900;
-static const int FRAME_WIDTH = 770, FRAME_HEIGHT = 450;
-    
-static const bool FULLSCREEN = false;
-//static const bool FULLSCREEN = true;
-    
-static const int RESET_TIME = 20000; // in milli seconds
-//---------------------------------------------------------
-
 #include <Core/IGameFactory.h>
-#include <Display/Camera.h>
-#include <Display/Viewport.h>
+
+// forward declarations
+namespace OpenEngine {
+  namespace Display {
+    class Camera;
+    class Viewport;
+  }
+}
 
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Display;
@@ -37,6 +32,7 @@ private:
   
 public:
   Factory();
+  virtual ~Factory();
   bool         SetupEngine(IGameEngine& engine);
   IFrame*      GetFrame();
   IRenderer*   GetRenderer();
