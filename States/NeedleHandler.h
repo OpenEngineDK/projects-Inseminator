@@ -122,7 +122,6 @@ public:
         suckEnabled = false;
         init = true;
         mus = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
-        mus->HideCursor();
 
         // Keyboard bindings
         IKeyboard::keyDownEvent.Add(keyDown);
@@ -209,6 +208,7 @@ public:
     void Reset(){
         if( spermatozoa != NULL && released ){
             spermatozoa->SetPosition(Vector<3,float>(2.5, 0, 0));
+	    rootNode->RemoveNode(spermatozoa->GetTransformation());
             needle->AddNode(spermatozoa->GetTransformation());
         }
         needle->SetPosition(Vector<3,float>(5, 1, 0.0));

@@ -18,6 +18,9 @@ protected:
     }
 public:
     virtual void Initialize() {
+      (dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse))))
+	->HideCursor();
+
         // Lookup the Game State Manager
         sm = dynamic_cast<StateManager*>(IGameEngine::Instance().Lookup(typeid(StateManager)));
 

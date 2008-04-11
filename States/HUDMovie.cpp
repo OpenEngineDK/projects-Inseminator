@@ -30,6 +30,7 @@ void HUDMovie::Initialize() {
 
 void HUDMovie::Deinitialize() {
     mplayer->Pause(true);
+    mplayer->Deinitialize();
 }
 
 void HUDMovie::Process(const float delta, const float percent) {
