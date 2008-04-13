@@ -39,10 +39,8 @@ static const int RESET_TIME = 20000; // in milli seconds
 // from extensions
 #include <Resources/IMovieResource.h>
 #include <Resources/FFMPEGResource.h>
-#include <Utils/MoveHandler.h>
 #include <Utils/QuitHandler.h>
 #include <Utils/Billboard.h>
-//#include <GLScreenshot.h>
 #include <MediPhysic.h>
 
 using namespace OpenEngine::Display;
@@ -50,6 +48,7 @@ using namespace OpenEngine::Devices;
 using namespace OpenEngine::Scene;
 using namespace OpenEngine::Renderers::OpenGL;
 using namespace OpenEngine::Resources;
+using namespace OpenEngine::Utils;
 
 bool Factory::SetupEngine(IGameEngine& engine) {
     try {
@@ -76,7 +75,7 @@ bool Factory::SetupEngine(IGameEngine& engine) {
         // Create MediPhysic module handling the sphere (Eeg)
 	MediPhysic* physic = new MediPhysic(modeldir);
 	/* MediPhysics needs the full path to resources because
-	   it does not use the ResourceManager to load models and textures */
+	   it does not use the ResourceManager to load models */
 
         // Create needle handler
         NeedleHandler* needleHandler = new NeedleHandler(physic, root);
@@ -195,23 +194,12 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 
         engine.AddModule(*sm);
 
-
-
         // global quit event handlers
         TimedQuitEventHandler* tquit_h = new TimedQuitEventHandler(RESET_TIME);
 	tquit_h->RegisterWithEngine(engine);
 
         QuitHandler* quit_h = new QuitHandler();
 	quit_h->BindToEventSystem();
-
-	/*
-	GLScreenshot* sshot_h = new GLScreenshot(resourcedir + "screenshots/");
-	sshot_h->RegisterWithEngine(engine);
-
-	// Register the handler as a listener on up and down keyboard events.
-        MoveHandler* move = new MoveHandler(*camera);
-	move->RegisterWithEngine(engine);
-	*/
 
     } catch (const Exception& ex) {
         logger.error << "An exception occurred: " << ex.what() << logger.end;

@@ -23,8 +23,9 @@ using namespace OpenEngine::Core;
 using namespace OpenEngine::Logging;
 
 int main( int argc, char** argv ) {
+#ifndef __APPLE__
     glutInit(&argc, argv);//TEMP ONLY FOR DRAWING WIRED SPHERE IN MediPhysic
-
+#endif
     // Setup logging facilities.
     Logger::AddLogger(new StreamLogger(&std::cout));
 

@@ -34,9 +34,10 @@ TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
   OpenEngine_Renderers_OpenGL
   # Extension dependencies
   Extensions_OpenGLRenderer
+  Extensions_TGAResource
+  Extensions_OBJResource
   Extensions_SDL
   Extensions_StateManager
   Extensions_MediPhysics
   Extensions_FFMPEGResource
-#  Extensions_GLScreenshot
  )
