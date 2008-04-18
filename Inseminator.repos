@@ -1,0 +1,18 @@
+# Repository Group for the Inseminator Project.
+# http://www.openengine.dk/wiki/Projects/Inseminator
+
+# Main repository
+/ http://www.openengine.dk/code/openengine
+
+# Project repository
+/projects/Inseminator http://www.openengine.dk/code/projects/Inseminator
+
+# Required extension repositories
+/extensions/OpenGLRenderer         http://www.openengine.dk/code/extensions/OpenGLRenderer
+/extensions/SDL                    http://www.openengine.dk/code/extensions/SDL
+/extensions/TGAResource            http://www.openengine.dk/code/extensions/TGAResource
+/extensions/OBJResource            http://www.openengine.dk/code/extensions/OBJResource
+/extensions/GenericHandlers        http://www.openengine.dk/code/extensions/GenericHandlers
+/extensions/FFMPEGResource         http://www.openengine.dk/code/extensions/FFMPEGResource
+/extensions/StateManager           http://www.openengine.dk/code/extensions/StateManager
+/extensions/MediPhysics            /Users/cpvc/Desktop/OpenEngine/inseminator/extensions/MediPhysics
