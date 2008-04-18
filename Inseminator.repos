@@ -15,4 +15,4 @@
 /extensions/GenericHandlers        http://www.openengine.dk/code/extensions/GenericHandlers
 /extensions/FFMPEGResource         http://www.openengine.dk/code/extensions/FFMPEGResource
 /extensions/StateManager           http://www.openengine.dk/code/extensions/StateManager
-/extensions/MediPhysics            /Users/cpvc/Desktop/OpenEngine/inseminator/extensions/MediPhysics
+#/extensions/MediPhysics            /Users/user/OpenEngine/inseminator/extensions/MediPhysics
