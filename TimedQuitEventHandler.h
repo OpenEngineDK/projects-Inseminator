@@ -6,7 +6,7 @@
 
 using namespace OpenEngine::Devices;
 
-class TimedQuitEventHandler : public IModule {
+class TimedQuitEventHandler : public IModule, public IListener<KeyboardEventArg>  {
 private:
     double timePast;
     bool left, right;
@@ -46,6 +46,13 @@ public:
 	ResetSystem();
     }
 
+    void Handle(KeyboardEventArg arg) {
+      if (arg.type == KeyboardEventArg::PRESS)
+	  HandleDownEvent(arg);
+      else
+	  HandleUpEvent(arg);
+    }
+
     void HandleUpEvent(KeyboardEventArg arg) {
       if (arg.sym == KEY_LEFT)
 	left = false;
@@ -61,16 +68,7 @@ public:
     }
 
     void RegisterWithEngine(IGameEngine& engine) {
-        Listener<TimedQuitEventHandler, KeyboardEventArg>* quit_down
-            = new Listener<TimedQuitEventHandler, KeyboardEventArg>
-	  (*this, &TimedQuitEventHandler::HandleDownEvent);
-        IKeyboard::keyDownEvent.Add(quit_down);
-
-        Listener<TimedQuitEventHandler, KeyboardEventArg>* quit_up
-            = new Listener<TimedQuitEventHandler, KeyboardEventArg>
-	  (*this, &TimedQuitEventHandler::HandleUpEvent);
-        IKeyboard::keyUpEvent.Add(quit_up);
-
+        IKeyboard::keyEvent.Attach(*this);
         engine.AddModule(*this);
     }
 };

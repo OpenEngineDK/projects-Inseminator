@@ -5,6 +5,7 @@
 #include <Core/IGameEngine.h>
 #include <Devices/IKeyboard.h>
 #include <Logging/Logger.h>
+#include <Resources/ResourceManager.h>
 
 #include "HUDMovie.h"
 #include "HUDState.h"

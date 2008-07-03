@@ -4,10 +4,10 @@
 #include "BaseState.h"
 #include "HUDisplay.h"
 
-class HUDState : public BaseState {
+class HUDState : public BaseState, public IListener<KeyboardEventArg> {
 private:
     bool restart; //to restart the story board and start over
-    Listener<HUDState,KeyboardEventArg>* down;
+
 protected:
     HUDisplay* hud;
 
@@ -15,20 +15,18 @@ protected:
     HUDState(string nextState, bool restart = false) : BaseState(nextState) {
         this->restart = restart;
         hud = NULL;
-        down = new Listener<HUDState,KeyboardEventArg>
-	  (*this, &HUDState::HandleDownEvent);
     }
 public:
     virtual void Initialize() {
         BaseState::Initialize();
 
         // Subscribe for keyevents
-        IKeyboard::keyDownEvent.Add(down);
+        IKeyboard::keyEvent.Attach(*this);
         root->AddNode(hud);
     }
 
     virtual void Deinitialize() {
-        IKeyboard::keyDownEvent.Remove(down);
+        IKeyboard::keyEvent.Detach(*this);
         root->RemoveNode(hud);
 
         BaseState::Deinitialize();
@@ -49,8 +47,8 @@ public:
         hud->Process(delta, percent);
     }
 
-    void HandleDownEvent(KeyboardEventArg arg) { 
-        if( arg.sym == KEY_SPACE ){
+    void Handle(KeyboardEventArg arg) { 
+        if( arg.sym == KEY_SPACE && arg.type == KeyboardEventArg::PRESS) {
 	    hud->FadeDown();
         }
     }

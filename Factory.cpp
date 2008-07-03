@@ -15,14 +15,17 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include "TimedQuitEventHandler.h"
 #include "States/HUDisplay.h"
 #include "States/Background.h"
+
 #include "States/HitTheLittleGuyState.h"
 #include "States/TurnTheEggState.h"
 #include "States/InseminateState.h"
 #include "States/SelectState.h"
+
 #include "States/MovieState.h"
 #include "States/PictureState.h"
 #include "States/NeedleHandler.h"
 
+#include <Display/Frustum.h>
 #include <Display/ViewingVolume.h>
 #include <Display/SDLFrame.h>
 #include <Display/Camera.h>
@@ -74,8 +77,8 @@ bool Factory::SetupEngine(IGameEngine& engine) {
 
         // Create MediPhysic module handling the sphere (Eeg)
 	MediPhysic* physic = new MediPhysic(modeldir);
-	/* MediPhysics needs the full path to resources because
-	   it does not use the ResourceManager to load models */
+	// MediPhysics needs the full path to resources because
+	// it does not use the ResourceManager to load models
 
         // Create needle handler
         NeedleHandler* needleHandler = new NeedleHandler(physic, root);
@@ -220,10 +223,17 @@ Factory::Factory() {
     camera = new Camera(*(new ViewingVolume()));
     camera->SetPosition(Vector<3,float>(3,0,-15));
     camera->LookAt(Vector<3,float>(3,0,0));
-    viewport->SetViewingVolume(camera);
+    //viewport->SetViewingVolume(camera);
+
+    // frustum hack
+    Frustum* frustum = new Frustum(*camera);
+    frustum->SetFar(1000);
+    viewport->SetViewingVolume(frustum);
       
     renderer = new Renderer();
-    renderer->AddRenderingView(new RenderingView(*viewport));
+    renderer->initialize.Attach(*(new TextureLoader()));
+    // Add a rendering view to the renderer
+    renderer->process.Attach(*(new RenderingView(*viewport)));
 }
 
 Factory::~Factory() {

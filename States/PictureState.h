@@ -4,13 +4,16 @@
 #include <Core/IModule.h>
 #include <Core/IGameEngine.h>
 #include <Devices/IKeyboard.h>
+#include <Devices/IMouse.h>
 #include <Renderers/OpenGL/TextureLoader.h>
 #include <Logging/Logger.h>
+#include <Renderers/OpenGL/TextureLoader.h>
 #include "HUDisplay.h"
 
 #include "HUDState.h"
 
 using OpenEngine::Logging::Logger;
+using OpenEngine::Renderers::OpenGL::TextureLoader;
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Devices;
 

@@ -5,25 +5,29 @@
 #include "MediPhysic.h"
 
 #include <Core/GameEngine.h>
+#include <Core/IGameEngine.h>
 #include <Devices/IMouse.h>
+#include <Devices/IKeyboard.h>
 #include <Resources/IModelResource.h>
 #include <Resources/ResourceManager.h>
 #include <Scene/ISceneNode.h>
 #include <Renderers/OpenGL/TextureLoader.h>
 #include <Logging/Logger.h>
 
-using OpenEngine::Core::GameEngine;
+
 using OpenEngine::Scene::ISceneNode;
 using OpenEngine::Renderers::OpenGL::TextureLoader;
 
+using namespace OpenEngine::Core;
 using namespace OpenEngine::Logging;
 using namespace OpenEngine::Resources;
+using namespace OpenEngine::Devices;
 
 static const float speed = 0.05f;
 static const float MAX_TIME = 120000.0; // in millisecs
 static const float MAX_MOUSE_SPEED = 0.33;
 
-class NeedleHandler : public IModule {
+class NeedleHandler : public IModule, public IListener<KeyboardEventArg> {
 private:
     float timer;
 
@@ -31,9 +35,6 @@ private:
     Spermatozoa* spermatozoa;
     IMouse* mus;
     ISceneNode* rootNode;
-
-    Listener<NeedleHandler, KeyboardEventArg>* keyDown;
-    Listener<NeedleHandler, KeyboardEventArg>* keyUp;
 
     bool sucking, suckedUpRight, suckEnabled;
     int lx, ly;                      // last mouse position
@@ -52,17 +53,12 @@ public:
         timer = 0.0f;
         suckEnabled = false;
 
-        // Keyboard bindings
-        keyDown = new Listener<NeedleHandler, KeyboardEventArg> (*this, &NeedleHandler::KeyDown);
-        keyUp   = new Listener<NeedleHandler, KeyboardEventArg> (*this, &NeedleHandler::KeyUp);
-
         // Load Needle model
         IModelResourcePtr mod = ResourceManager<IModelResource>::Create("Needle.obj");
         mod->Load();
-        if( mod->GetFaceSet() == NULL )
+        if( mod->GetSceneNode() == NULL )
             logger.error << "Loading needle obj file failed - FaceSet is empty!" << logger.end;
-        GeometryNode* gNode = new GeometryNode();
-        gNode->SetFaceSet(mod->GetFaceSet());
+        ISceneNode* gNode = mod->GetSceneNode();
 
         mod->Unload();
         needle = new TransformationNode();
@@ -124,8 +120,7 @@ public:
         mus = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
 
         // Keyboard bindings
-        IKeyboard::keyDownEvent.Add(keyDown);
-        IKeyboard::keyUpEvent.Add(keyUp);
+        IKeyboard::keyEvent.Attach(*this);
 
         needle->SetPosition(Vector<3,float>(5,1,0.0));
         rootNode->AddNode(needle);
@@ -146,8 +141,8 @@ public:
             rootNode->RemoveNode(spermatozoa->GetTransformation());
         }
         rootNode->RemoveNode(needle);
-        IKeyboard::keyDownEvent.Remove(keyDown);
-        IKeyboard::keyUpEvent.Remove(keyUp);
+
+        IKeyboard::keyEvent.Detach(*this);
     }
 
     bool IsTypeOf(const std::type_info& inf) { return false; }
@@ -290,6 +285,13 @@ public:
             lx = s.x;
             ly = s.y;
         }
+    }
+
+    void Handle(KeyboardEventArg arg) {
+      if (arg.type == KeyboardEventArg::PRESS)
+	  KeyDown(arg);
+      else
+	  KeyUp(arg);
     }
 
     void KeyDown(KeyboardEventArg arg) {

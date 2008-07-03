@@ -7,6 +7,9 @@ SET( PROJECT_SOURCES
   # Add all the cpp source files here
      main.cpp
      Factory.cpp
+     States/BaseState.cpp
+     States/SimulationState.cpp
+     States/SelectState.cpp
      States/HUDisplay.cpp
      States/HUDMovie.cpp
      States/Background.cpp 
