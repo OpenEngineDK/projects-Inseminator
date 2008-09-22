@@ -6,7 +6,7 @@ darcs-dev / fh.daimi.au.dk:/users/cgd/code/openengine
 
 # Inseminator project
 darcs /projects/Inseminator http://openengine.dk/code/projects/Inseminator
-darcs-dev /projects/DragonPanic fh.daimi.au.dk:/users/cgd/code/projects/Inseminator
+darcs-dev /projects/Inseminator fh.daimi.au.dk:/users/cgd/code/projects/Inseminator
 
 # standard set of extensions
 darcs /extensions/SDL             http://openengine.dk/code/extensions/SDL
