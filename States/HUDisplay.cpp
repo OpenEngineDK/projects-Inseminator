@@ -12,7 +12,7 @@
 #include <Logging/Logger.h>
 
 HUDisplay::HUDisplay(unsigned int width, unsigned int height) : textureId(0) {
-  SCREEN_WIDTH = width; // = 1280;
+    SCREEN_WIDTH = width; // = 1280;
     SCREEN_HEIGHT = height; // = 600;
     hasInitialized = false;
     fade = 1.0f;
@@ -105,7 +105,9 @@ void HUDisplay::ApplyOrthoView(){
     glBindTexture(GL_TEXTURE_2D, textureId);
 }
 
-void HUDisplay::Process(const float delta, const float percent) {
+void HUDisplay::Process(ProcessEventArg arg) {
+    float delta = arg.approx / 1000.0;
+
     if (hasInitialized && endRequested)
     fade += 0.001 * delta; //fade down
     else if (!hasInitialized)

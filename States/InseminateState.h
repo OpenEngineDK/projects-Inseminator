@@ -15,7 +15,8 @@ private:
     float time;
     bool failed;
 public:
- InseminateState(string nextState, MediPhysic* physic) : SimulationState(nextState) {
+ InseminateState(string nextState, MediPhysic* physic, StateObjects& so)
+     : SimulationState(nextState, so) {
         this->physic = physic;
         time = 0;
         failed = false;
@@ -23,14 +24,13 @@ public:
     ~InseminateState() {}
 
     void Initialize(){
-        IRenderer* rendere = dynamic_cast<IRenderer*>
-	  (IGameEngine::Instance().Lookup(typeid(IRenderer)));
-        root = rendere->GetSceneRoot();      
-
+        root = so.GetSceneNode();
         root->AddNode(physic);
-        IGameEngine::Instance().AddModule(*physic, IGameEngine::TICK_DEPENDENT);
-	/* physic node must be in the tree before initializing
-	   the needle, or the transparency will f... */
+
+        //@@@todo: should be IEngine::TICK_DEPENDENT
+        so.GetEngine().ProcessEvent().Attach(*physic);
+        // physic node must be in the tree before initializing
+        // the needle, or the transparency will f...
 
         SimulationState::Initialize(); //this also initializes the needle
 
@@ -45,18 +45,19 @@ public:
 
     void Deinitialize() {
         root->RemoveNode(physic);
-        physic->Deinitialize();
-        IGameEngine::Instance().RemoveModule(*physic);
+        physic->Handle(DeinitializeEventArg());
+        //@@@todo: should be IEngine::TICK_DEPENDENT
+        so.GetEngine().ProcessEvent().Detach(*physic);
 
         if(physic->transNode!=NULL)
             root->RemoveNode(physic->transNode);
 
-	SimulationState::Deinitialize();
+        SimulationState::Deinitialize();
     }
 
-    bool IsTypeOf(const std::type_info& inf) { return typeid(InseminateState) == inf; }
+    void Process(ProcessEventArg arg) {
+        float delta = arg.approx / 1000.0;
 
-    void Process(const float delta, const float percent) {
         // Check if we the injecting went well
         Spermatozoa* spermatozoa = needleHandler->GetReleasedSpermatozoa();
         if (spermatozoa != NULL && !changeState && !failed) {
@@ -78,7 +79,7 @@ public:
             failed = false;
         }
 
-        SimulationState::Process(delta,percent);
+        SimulationState::Process(arg);
     }
 };
 

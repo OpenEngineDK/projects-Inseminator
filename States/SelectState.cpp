@@ -2,7 +2,8 @@
 
 #include "Utils/Billboard.h"
 
-SelectState::SelectState(string nextState) : SimulationState(nextState) { 
+SelectState::SelectState(string nextState, StateObjects& so)
+  : SimulationState(nextState, so) { 
         eval = false;
 }
 
@@ -32,12 +33,10 @@ void SelectState::Deinitialize() {
     SimulationState::Deinitialize();
 }
 
-bool SelectState::IsTypeOf(const std::type_info& inf) {
-    return typeid(SelectState) == inf;
-}
+void SelectState::Process(ProcessEventArg arg) {
+    float delta = arg.approx / 1000.0;
 
-void SelectState::Process(const float delta, const float percent) {
-    SimulationState::Process(delta,percent);
+    SimulationState::Process(arg);
 
     // stops the rotation and movement when done
     if (changeState) return;

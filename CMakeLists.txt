@@ -28,13 +28,13 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 
 TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
   OpenEngine_Core
+  OpenEngine_Devices
   OpenEngine_Display
+  OpenEngine_Geometry
+  OpenEngine_Logging
+  OpenEngine_Math
   OpenEngine_Resources
   OpenEngine_Scene
-  OpenEngine_Logging
-  OpenEngine_Devices
-  OpenEngine_Geometry
-  OpenEngine_Renderers_OpenGL
   # Extension dependencies
   Extensions_OpenGLRenderer
   Extensions_TGAResource

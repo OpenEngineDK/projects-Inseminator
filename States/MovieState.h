@@ -2,7 +2,6 @@
 #define _MOVIE_STATE_
 
 #include <Core/IModule.h>
-#include <Core/IGameEngine.h>
 #include <Devices/IKeyboard.h>
 #include <Logging/Logger.h>
 #include <Resources/ResourceManager.h>
@@ -19,10 +18,11 @@ private:
     HUDMovie* movie;
 
 public:
- MovieState(string movieName, string nextState, bool restart = false) : HUDState(nextState, restart) {
+ MovieState(string movieName, string nextState, StateObjects& so, 
+            bool restart = false) : HUDState(nextState, so, restart) {
         IMovieResourcePtr mplayer = 
 	  ResourceManager<IMovieResource>::Create(movieName);
-        movie = new HUDMovie(mplayer);
+        movie = new HUDMovie(mplayer, so);
 	hud = movie;
     }
     ~MovieState() {}
@@ -37,13 +37,9 @@ public:
         movie->Deinitialize();
     }
 
-    virtual void Process(const float delta, const float percent){
-        HUDState::Process(delta,percent);
-        movie->Process(delta,percent);
-    }
-
-    bool IsTypeOf(const std::type_info& inf) {
-        return typeid(MovieState) == inf;
+    virtual void Process(ProcessEventArg arg){
+        HUDState::Process(arg);
+        movie->Process(arg);
     }
 };
 

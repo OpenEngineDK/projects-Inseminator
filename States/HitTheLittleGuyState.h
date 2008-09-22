@@ -15,7 +15,8 @@ private:
     Spermatozoa* spermMarked;
 
 public:
- HitTheLittleGuyState(string nextState) : SimulationState(nextState) {
+ HitTheLittleGuyState(string nextState, StateObjects& so)
+     : SimulationState(nextState, so) {
         spermList = new list<Spermatozoa*>();
     }
     ~HitTheLittleGuyState() {}
@@ -56,9 +57,8 @@ public:
       SimulationState::Deinitialize();
     }
 
-    bool IsTypeOf(const std::type_info& inf) { return typeid(HitTheLittleGuyState) == inf; }
-
-    void Process(const float delta, const float percent) {
+    void Process(ProcessEventArg arg) {
+        float delta = arg.approx / 1000.0;
         // Update all spermatozoas
         list<Spermatozoa*>::iterator itr;
         for( itr = spermList->begin(); itr!=spermList->end(); itr++) {
@@ -68,7 +68,7 @@ public:
         if (!changeState)
             CheckCollision(delta);
 
-	SimulationState::Process(delta, percent);
+        SimulationState::Process(arg);
     };
 
     void CheckCollision(const float delta) {

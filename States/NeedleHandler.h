@@ -4,8 +4,8 @@
 #include "Spermatozoa.h"
 #include "MediPhysic.h"
 
-#include <Core/GameEngine.h>
-#include <Core/IGameEngine.h>
+#include <Core/IEngine.h>
+#include <Core/IState.h>
 #include <Devices/IMouse.h>
 #include <Devices/IKeyboard.h>
 #include <Resources/IModelResource.h>
@@ -27,13 +27,15 @@ static const float speed = 0.05f;
 static const float MAX_TIME = 120000.0; // in millisecs
 static const float MAX_MOUSE_SPEED = 0.33;
 
-class NeedleHandler : public IModule, public IListener<KeyboardEventArg> {
+class NeedleHandler : public IState, public IListener<KeyboardEventArg> {
 private:
     float timer;
 
     TransformationNode* needle;
     Spermatozoa* spermatozoa;
     IMouse* mus;
+    IKeyboard& keyboard;
+    IEngine& engine;
     ISceneNode* rootNode;
 
     bool sucking, suckedUpRight, suckEnabled;
@@ -46,8 +48,8 @@ private:
     Spermatozoa* released;
 
 public:
- NeedleHandler(MediPhysic* mediPhysic, ISceneNode* root) 
-        : needle(NULL), spermatozoa(NULL), mus(NULL), rootNode(root), 
+ NeedleHandler(MediPhysic* mediPhysic, ISceneNode* root, IMouse* mouse, IKeyboard& keyboard, IEngine& engine) 
+     : needle(NULL), spermatozoa(NULL), mus(mouse), keyboard(keyboard), engine(engine), rootNode(root), 
           lx(0), ly(0), init(true), left(false), right(false),  released(NULL) {
 
         timer = 0.0f;
@@ -117,10 +119,10 @@ public:
     void Initialize() {
         suckEnabled = false;
         init = true;
-        mus = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
+        //mus = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
 
         // Keyboard bindings
-        IKeyboard::keyEvent.Attach(*this);
+        keyboard.KeyEvent().Attach(*this);
 
         needle->SetPosition(Vector<3,float>(5,1,0.0));
         rootNode->AddNode(needle);
@@ -142,16 +144,16 @@ public:
         }
         rootNode->RemoveNode(needle);
 
-        IKeyboard::keyEvent.Detach(*this);
+        keyboard.KeyEvent().Detach(*this);
     }
 
-    bool IsTypeOf(const std::type_info& inf) { return false; }
-    void Process(const float deltaTime, const float percent) {
+    void Process(ProcessEventArg arg) {
+        float deltaTime = arg.approx / 1000.0;
         timer += deltaTime;
         if (timer > MAX_TIME) {
             timer = 0;
             logger.info << "timout off " << MAX_TIME << " mSec, simulator was restarted" << logger.end;
-            IGameEngine::Instance().Stop();
+            engine.Stop();
         }
 
         // Handle events

@@ -11,13 +11,13 @@ private:
     TransformationNode* failedTexture;
     bool eval;
 public:
-    SelectState(string nextState);
+    SelectState(string nextState, StateObjects& so);
     ~SelectState();
 
     void Initialize();
     void Deinitialize();
-    bool IsTypeOf(const std::type_info& inf);
-    void Process(const float delta, const float percent);
+    void Process(ProcessEventArg arg);
+
     void CheckCollision();
     void SetSpermatozoaList(list<Spermatozoa*>* s);
 };

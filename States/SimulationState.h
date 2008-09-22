@@ -26,13 +26,11 @@ protected:
 
     bool changeState;
 
-    SimulationState();
-
 public:
-    SimulationState(string nextState);
+    SimulationState(string nextState, StateObjects& so);
     void Initialize();
     void Deinitialize();
-    void Process(const float delta, const float percent);
+    void Process(ProcessEventArg arg);
     void SetNeedle(NeedleHandler* needle);
     void SetBackground(Background* bg);
     void Handle(KeyboardEventArg arg);

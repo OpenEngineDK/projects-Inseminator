@@ -10,10 +10,12 @@
 #ifndef _HEADS_UP_DISPLAY_H_
 #define _HEADS_UP_DISPLAY_H_
 
+#include <Core/EngineEvents.h>
 #include <Renderers/IRenderNode.h>
 #include <Renderers/IRenderingView.h>
 #include <Resources/ITextureResource.h>
 
+using namespace OpenEngine::Core;
 using namespace OpenEngine::Resources;
 using namespace OpenEngine::Renderers;
 
@@ -41,7 +43,7 @@ public:
     bool Ended();
     void FadeDown();
     void Blend(bool blend);
-    void Process(const float delta, const float percent);
+    void Process(ProcessEventArg arg);
 };
 
 #endif

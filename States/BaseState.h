@@ -1,30 +1,32 @@
 #ifndef _BASE_STATE_
 #define _BASE_STATE_
 
-#include <Core/IModule.h>
+#include <Core/IState.h>
 #include <Core/StateManager.h>
 #include <Scene/ISceneNode.h>
 #include <string>
 
+#include "StateObjects.h"
+
 using std::string;
-using OpenEngine::Core::IModule;
+using OpenEngine::Core::IState;
 using OpenEngine::Core::StateManager;
 using OpenEngine::Scene::ISceneNode;
 
-class BaseState : public IModule {
+class BaseState : public IState {
 private:
     string nextState;
     StateManager* sm;
 protected:
+    StateObjects& so;
     ISceneNode* root;
 
-    BaseState();
-    BaseState(string nextState);
+    BaseState(string nextState, StateObjects& so);
     virtual ~BaseState();
 public:
     virtual void Initialize();
     virtual void Deinitialize();
-    virtual void Process(const float delta, const float percent);
+    virtual void Process(ProcessEventArg arg);
     void NextState();
 };
 

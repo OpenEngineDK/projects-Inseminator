@@ -2,9 +2,7 @@
 
 static const bool skipKeyEnabled = false;
 
-SimulationState::SimulationState() {}
-
-SimulationState::SimulationState(string nextState) : BaseState(nextState) {
+SimulationState::SimulationState(string nextState, StateObjects& so) : BaseState(nextState, so) {
         fade = 0.0f;
         fadeTime = 0.001;
         changeState = false;
@@ -15,7 +13,7 @@ void SimulationState::Initialize() {
 
     // Subscribe for keyevents
     if(skipKeyEnabled)
-        IKeyboard::keyEvent.Attach(*this);
+        so.GetKeyboard().KeyEvent().Attach(*this);
 
     // Initialize all
     bg->Initialize();
@@ -35,11 +33,11 @@ void SimulationState::Deinitialize() {
 
     needleHandler->Deinitialize();
     bg->Deinitialize();
-    
+
     // Unsubscribe key events
     if(skipKeyEnabled)
-        IKeyboard::keyEvent.Detach(*this);
-    
+        so.GetKeyboard().KeyEvent().Detach(*this);
+
     changeState = false; // reset changeState
     fade = 0.0f; // reset fade
     
@@ -47,22 +45,23 @@ void SimulationState::Deinitialize() {
     needleHandler->Deinitialize(); //??? deinit again?
 }
 
-void SimulationState::Process(const float delta, const float percent) {
-    bg->Process(delta, percent);
-    needleHandler->Process(delta, percent);
-    hud->Process(delta,percent);
+void SimulationState::Process(ProcessEventArg arg) {
+    bg->Process(arg);
+    needleHandler->Process(arg);
+    hud->Process(arg);
 
+    float delta = arg.approx / 1000.0;
     if (changeState) { // fade down
         if (fade > 0.0) fade -= fadeTime * delta;
-	if (fade < 0.000001) { // when faded down change to next state
-	    NextState();
-	    return;
-	}
+        if (fade < 0.000001) { // when faded down change to next state
+            NextState();
+            return;
+        }
     } else // fade up
         if (fade < 1.0) fade += fadeTime * delta;
     glClearColor(fade, fade, fade, 0.5f);
 
-    BaseState::Process(delta,percent);
+    BaseState::Process(arg);
 }
 
 void SimulationState::SetNeedle(NeedleHandler* needle) {

@@ -2,7 +2,6 @@
 #define _PICTURE_STATE_
 
 #include <Core/IModule.h>
-#include <Core/IGameEngine.h>
 #include <Devices/IKeyboard.h>
 #include <Devices/IMouse.h>
 #include <Renderers/OpenGL/TextureLoader.h>
@@ -24,14 +23,15 @@ private:
     IMouse* mouse;
 
 public:
-    PictureState(string pictureName, string nextState) : HUDState(nextState) {
+ PictureState(string pictureName, string nextState, StateObjects& so)
+     : HUDState(nextState, so) {
+        this->mouse = so.GetMouse();
         this->pictureName = pictureName;
     }
     ~PictureState() {}
 
     virtual void Initialize() {
-        mouse = dynamic_cast<IMouse*>(IGameEngine::Instance()
-				      .Lookup(typeid(IMouse)));
+        //mouse = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
         initMouseState = mouse->GetState();
 
         // Load texture
@@ -47,7 +47,7 @@ public:
 	HUDState::Deinitialize();
     }
 
-    virtual void Process(const float delta, const float percent){
+    virtual void Process(ProcessEventArg arg) {
         //wait for mouse movement to go to the next state
         MouseState currentMouseState = mouse->GetState();
         if(initMouseState.x==0 && initMouseState.y == 0)
@@ -55,11 +55,7 @@ public:
         else if ( (abs(initMouseState.x - currentMouseState.x) > 5) || (abs(initMouseState.y != currentMouseState.y) > 5) )
             hud->FadeDown();
 
-	HUDState::Process(delta,percent);
-    }
-
-    bool IsTypeOf(const std::type_info& inf) {
-        return typeid(PictureState) == inf;
+	HUDState::Process(arg);
     }
 };
 

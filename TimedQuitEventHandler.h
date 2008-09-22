@@ -1,21 +1,25 @@
 #ifndef _TIMED_QUIT_EVENT_HANDLER_
 #define _TIMED_QUIT_EVENT_HANDLER_
 
+#include <Core/IEngine.h>
 #include <Devices/IKeyboard.h>
 #include <Devices/Symbols.h>
 
+using OpenEngine::Core::IEngine;
 using namespace OpenEngine::Devices;
 
-class TimedQuitEventHandler : public IModule, public IListener<KeyboardEventArg>  {
+class TimedQuitEventHandler : public IListener<ProcessEventArg>
+, public IListener<KeyboardEventArg>  {
 private:
     double timePast;
     bool left, right;
     int RESET_TIME;
+    IEngine& engine;
 
     void ResetSystem() {
       /* this resets the system because the OS
 	 restarts the program when it exits */
-      IGameEngine::Instance().Stop();
+      engine.Stop();
 
       /*
 	// old method
@@ -26,24 +30,21 @@ private:
     }
 
 public:
-    TimedQuitEventHandler(int resetTime) {
+   TimedQuitEventHandler(int resetTime, IEngine& engine) : engine(engine) {
       timePast = 0.0f;
       left = right = false;
       RESET_TIME = resetTime;
     }
 
-    void Initialize() {}
-    void Deinitialize() {}
-    bool IsTypeOf(const std::type_info& inf) { return false; }
+    void Handle(ProcessEventArg arg) {
+        float deltaTime = arg.approx/1000.0;
+        if (left && right)
+            timePast += deltaTime;
+        else
+            timePast = 0.0f;
 
-    void Process(const float deltaTime, const float percent) {
-      if (left && right)
-	timePast += deltaTime;
-      else
-	timePast = 0.0f;
-      
-      if (timePast > RESET_TIME)
-	ResetSystem();
+        if (timePast > RESET_TIME)
+            ResetSystem();
     }
 
     void Handle(KeyboardEventArg arg) {
@@ -65,11 +66,6 @@ public:
 	left = true;
       else if (arg.sym == KEY_RIGHT)
 	right = true;
-    }
-
-    void RegisterWithEngine(IGameEngine& engine) {
-        IKeyboard::keyEvent.Attach(*this);
-        engine.AddModule(*this);
     }
 };
 

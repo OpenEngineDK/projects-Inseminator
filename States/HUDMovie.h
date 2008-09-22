@@ -13,6 +13,7 @@
 #include <Renderers/IRenderNode.h>
 #include "HUDisplay.h"
 #include <Resources/IMovieResource.h>
+#include "StateObjects.h"
 
 using OpenEngine::Scene::IRenderNode;
 using OpenEngine::Renderers::IRenderer;
@@ -21,13 +22,14 @@ using namespace OpenEngine::Resources;
 class HUDMovie : public HUDisplay {
 private:
     IMovieResourcePtr mplayer;
+    StateObjects& so;
 
 public:
-    HUDMovie(IMovieResourcePtr mplayer);
+    HUDMovie(IMovieResourcePtr mplayer, StateObjects& so);
     ~HUDMovie();
 
     // Only for processing the movie decoding
-    void Process(const float delta, const float percent);
+    void Process(ProcessEventArg arg);
 
     void Initialize();
     void Deinitialize();

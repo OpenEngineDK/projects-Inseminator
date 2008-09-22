@@ -13,6 +13,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 
 #include "InitGLNode.h"
 #include "TimedQuitEventHandler.h"
+#include "States/StateObjects.h"
 #include "States/HUDisplay.h"
 #include "States/Background.h"
 
@@ -37,6 +38,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Resources/DirectoryManager.h>
 #include <Resources/ResourceManager.h>
 #include <Resources/OBJResource.h>
+#include <Resources/TextureReloader.h>
 #include <Resources/TGAResource.h>
 
 // from extensions
@@ -53,125 +55,144 @@ using namespace OpenEngine::Renderers::OpenGL;
 using namespace OpenEngine::Resources;
 using namespace OpenEngine::Utils;
 
-bool Factory::SetupEngine(IGameEngine& engine) {
+bool Factory::SetupEngine(IEngine& engine) {
     try {
+        engine.InitializeEvent().Attach(*frame);
+        engine.ProcessEvent().Attach(*frame);
+        engine.DeinitializeEvent().Attach(*frame);
+
+        // setup renderer
+        engine.InitializeEvent().Attach(*renderer);
+        engine.ProcessEvent().Attach(*renderer);
+        engine.DeinitializeEvent().Attach(*renderer);
+        TextureReloader* trl = new TextureReloader();
+        renderer->PreProcessEvent().Attach(*trl);
+
         // Setup input handling
         SDLInput* input = new SDLInput();
-        engine.AddModule(*input);
+        IKeyboard* keyboard = input;
+        IMouse* mouse = input;
+        engine.InitializeEvent().Attach(*input);
+        engine.ProcessEvent().Attach(*input);
+        engine.DeinitializeEvent().Attach(*input);
 
-	string resourcedir = "./projects/Inseminator/data/";
-	logger.info << "Resource directory: " << resourcedir << logger.end;
-	string modeldir = resourcedir + "models/";
-	DirectoryManager::AppendPath(modeldir);
-	string videodir = resourcedir + "videos/";
-	DirectoryManager::AppendPath(videodir);
-
+        string resourcedir = "./projects/Inseminator/data/";
+        logger.info << "Resource directory: " << resourcedir << logger.end;
+        string modeldir = resourcedir + "models/";
+        DirectoryManager::AppendPath(modeldir);
+        string videodir = resourcedir + "videos/";
+        DirectoryManager::AppendPath(videodir);
+        
         // load the resource plug-ins
         ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
         ResourceManager<ITextureResource>::AddPlugin(new TGAPlugin());
-	ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
+        ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
 
         // Create scene root
-	ISceneNode* root = new InitGLNode();
-        this->renderer->SetSceneRoot(root);
+        ISceneNode* root = new InitGLNode();
+        renderer->SetSceneRoot(root);
+
+        StateManager* sm = new StateManager();
+        StateObjects* so = 
+            new StateObjects(root, sm, mouse, *keyboard, engine, *trl);
 
         // Create MediPhysic module handling the sphere (Eeg)
-	MediPhysic* physic = new MediPhysic(modeldir);
-	// MediPhysics needs the full path to resources because
-	// it does not use the ResourceManager to load models
-
+        MediPhysic* physic = new MediPhysic(modeldir);
+        // MediPhysics needs the full path to resources because
+        // it does not use the ResourceManager to load models
+        
         // Create needle handler
-        NeedleHandler* needleHandler = new NeedleHandler(physic, root);
+        NeedleHandler* needleHandler = 
+            new NeedleHandler(physic, root, mouse, *keyboard, engine);
         physic->needle = needleHandler->GetTransformationNode();
 
         // Add noisy floating textures to the background
-        Background* bg = new Background("Background.tga");
+        Background* bg = new Background("Background.tga",root);
 
         // 01. Start up picture
-	PictureState* startup = new PictureState
-	  ("Intro.tga", "IntroState");
-
+        PictureState* startup = new PictureState
+            ("Intro.tga", "IntroState", *so);
+        
         // 02. Intro (Video)
         MovieState* introState = new MovieState
-	  ("Intro.mov", "DonateTextState");
-
+            ("Intro.mov", "DonateTextState", *so);
+        
         // 03. "Morten has Donated" (Video)
         MovieState* donateTextState = new MovieState
-	  ("DonateText.mov", "DonateState");
-
+            ("DonateText.mov", "DonateState", *so);
+        
         // 04.
         MovieState* donateState = new MovieState
-	  ("Donate.mov", "HitTheLittleGuyText1");
-
+            ("Donate.mov", "HitTheLittleGuyText1", *so);
+        
         // 05.
         MovieState* hitText1 = new MovieState
-	  ("HitTheLittleGuyText1.mov", "HitTheLittleGuyText2");
-
+            ("HitTheLittleGuyText1.mov", "HitTheLittleGuyText2", *so);
+        
         // 06.
         MovieState* hitText2 = new MovieState
-	  ("HitTheLittleGuyText2.mov", "HitTheLittleGuyState");
+            ("HitTheLittleGuyText2.mov", "HitTheLittleGuyState", *so);
 
         // 07. "Hit The Little Guy" (Simulator)
         HitTheLittleGuyState* hitState = new HitTheLittleGuyState
-	  ("HitTheLittleGuySuccessState");
+            ("HitTheLittleGuySuccessState", *so);
         hitState->SetNeedle(needleHandler);
         hitState->SetBackground(bg);
-
+        
         // 08. Successfully accomplished (Video) 
         MovieState* hitSuccessState = new MovieState
-	  ("HitTheLittleGuySuccess.mov", "SelectTheLittleGuyText");
-
+            ("HitTheLittleGuySuccess.mov", "SelectTheLittleGuyText", *so);
+        
         // 09.
         MovieState* selectText = new MovieState
-	  ("SelectTheLittleGuyText.mov", "SelectTheLittleGuyState");
+            ("SelectTheLittleGuyText.mov", "SelectTheLittleGuyState", *so);
 
         // 10. "Select The Little Guy" (Simulator)
         SelectState* selectState = new SelectState
-	  ("SelectTheLittleGuySuccessState");
+            ("SelectTheLittleGuySuccessState", *so);
         selectState->SetNeedle(needleHandler);
         selectState->SetBackground(bg);
         selectState->SetSpermatozoaList(hitState->GetSpermatozoaList());
-
+        
         // 11. Successfully accomplished (Video)
         MovieState* selectSuccessState = new MovieState
-	  ("SelectTheLittleGuySuccess.mov", "TurnTheEggText");
-
+            ("SelectTheLittleGuySuccess.mov", "TurnTheEggText", *so);
+        
         // 12.
         MovieState* turnText = new MovieState
-	  ("TurnTheEggText.mov", "TurnTheEggState");
-
+            ("TurnTheEggText.mov", "TurnTheEggState", *so);
+        
         // 13. "Turn The Egg" (Simulator)
         TurnTheEggState* turnState = new TurnTheEggState
-	  ("TurnTheEggSuccessState", physic);
+            ("TurnTheEggSuccessState", physic, engine, *so);
         turnState->SetNeedle(needleHandler);
         turnState->SetBackground(bg);
-
+        
         // 14. Successfully accomplished (Video) 
         MovieState* turnSuccessState = new MovieState
-	  ("TurnTheEggSuccess.mov", "InseminationText");
-
+            ("TurnTheEggSuccess.mov", "InseminationText", *so);
+        
         // 15. Insemination (Simulator)
         MovieState* inseminateText = new MovieState
-	  ("InseminationText.mov", "InseminationState");
-
+            ("InseminationText.mov", "InseminationState", *so);
+        
         // 16. "Insemination" (Simulator)
         InseminateState* inseminateState = new InseminateState
-	  ("InseminationSuccessState", physic);
+            ("InseminationSuccessState", physic, *so);
         inseminateState->SetNeedle(needleHandler);
         inseminateState->SetBackground(bg);
 
         // 17. Successfully accomplished (Video)
         MovieState* inseminateSuccessState = new MovieState
-	  ("InseminationSuccess.mov", "Outro");
+            ("InseminationSuccess.mov", "Outro", *so);
 
         // 18. Outro (Video)
         MovieState* outro = new MovieState
-	  ("Outro.mov", "StartupPicture", true);
-
+            ("Outro.mov", "StartupPicture", *so, true);
 
 
         // Create and initialize StateManager
-	StateManager* sm = new StateManager("StartupPicture", startup);
+        sm->AddStateAsInitial("StartupPicture", startup);
 
         sm->AddState("IntroState", introState);
         sm->AddState("DonateTextState", donateTextState);
@@ -195,14 +216,17 @@ bool Factory::SetupEngine(IGameEngine& engine) {
         sm->AddState("InseminationSuccessState", inseminateSuccessState);
         sm->AddState("Outro", outro);
 
-        engine.AddModule(*sm);
+        engine.InitializeEvent().Attach(*sm);
+        engine.ProcessEvent().Attach(*sm);
+        engine.DeinitializeEvent().Attach(*sm);
 
         // global quit event handlers
-        TimedQuitEventHandler* tquit_h = new TimedQuitEventHandler(RESET_TIME);
-	tquit_h->RegisterWithEngine(engine);
+        TimedQuitEventHandler* tquit_h = 
+            new TimedQuitEventHandler(RESET_TIME,engine);
+        keyboard->KeyEvent().Attach(*tquit_h);
 
-        QuitHandler* quit_h = new QuitHandler();
-	quit_h->BindToEventSystem();
+        QuitHandler* quit_h = new QuitHandler(engine);
+        keyboard->KeyEvent().Attach(*quit_h);
 
     } catch (const Exception& ex) {
         logger.error << "An exception occurred: " << ex.what() << logger.end;
@@ -231,9 +255,9 @@ Factory::Factory() {
     viewport->SetViewingVolume(frustum);
       
     renderer = new Renderer();
-    renderer->initialize.Attach(*(new TextureLoader()));
+    renderer->InitializeEvent().Attach(*(new TextureLoader()));
     // Add a rendering view to the renderer
-    renderer->process.Attach(*(new RenderingView(*viewport)));
+    renderer->ProcessEvent().Attach(*(new RenderingView(*viewport)));
 }
 
 Factory::~Factory() {

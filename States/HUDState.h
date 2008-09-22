@@ -3,6 +3,7 @@
 
 #include "BaseState.h"
 #include "HUDisplay.h"
+#include "StateObjects.h"
 
 class HUDState : public BaseState, public IListener<KeyboardEventArg> {
 private:
@@ -11,8 +12,8 @@ private:
 protected:
     HUDisplay* hud;
 
-    HUDState() {}
-    HUDState(string nextState, bool restart = false) : BaseState(nextState) {
+ HUDState(string nextState, StateObjects& so, bool restart = false) 
+     : BaseState(nextState, so) {
         this->restart = restart;
         hud = NULL;
     }
@@ -21,35 +22,35 @@ public:
         BaseState::Initialize();
 
         // Subscribe for keyevents
-        IKeyboard::keyEvent.Attach(*this);
+        so.GetKeyboard().KeyEvent().Attach(*this);
         root->AddNode(hud);
     }
 
     virtual void Deinitialize() {
-        IKeyboard::keyEvent.Detach(*this);
+        so.GetKeyboard().KeyEvent().Detach(*this);
         root->RemoveNode(hud);
 
         BaseState::Deinitialize();
     }
 
-    virtual void Process(const float delta, const float percent) {
-	BaseState::Process(delta,percent);
+    virtual void Process(ProcessEventArg arg) {
+        BaseState::Process(arg);
 
-	if (hud->Ended()) {
-	  if (restart) {
-	    Deinitialize();
-	    IGameEngine::Instance().Stop();
-	  }
-	  else
-	    NextState();
-	}
-
-        hud->Process(delta, percent);
+        if (hud->Ended()) {
+            if (restart) {
+                Deinitialize();
+                so.GetEngine().Stop();
+            }
+            else
+                NextState();
+        }
+        
+        hud->Process(arg);
     }
 
     void Handle(KeyboardEventArg arg) { 
         if( arg.sym == KEY_SPACE && arg.type == KeyboardEventArg::PRESS) {
-	    hud->FadeDown();
+            hud->FadeDown();
         }
     }
 };

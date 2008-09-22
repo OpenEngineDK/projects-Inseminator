@@ -10,17 +10,17 @@
 #ifndef _BACKGROUND_H_
 #define _BACKGROUND_H_
 
-#include <Core/IModule.h>
+#include <Core/IState.h>
 #include <Scene/ISceneNode.h>
 #include <Scene/TransformationNode.h>
 #include <list>
 
 using std::list;
-using OpenEngine::Core::IModule;
+using OpenEngine::Core::IState;
 using OpenEngine::Scene::TransformationNode;
 using OpenEngine::Scene::ISceneNode;
 
-class Background : public IModule {
+class Background : public IState {
 private:
     list<TransformationNode*> noiseList;
     TransformationNode* background;
@@ -28,13 +28,12 @@ private:
     string texturefile;
     
 public:
-    Background(string texturefile);
+    Background(string texturefile, ISceneNode* root);
     ~Background();
+
     void Initialize();
     void Deinitialize();
-    bool IsTypeOf(const std::type_info& inf) { return typeid(Background) == inf; }
-
-    void Process(const float delta, const float percent);
+    void Process(ProcessEventArg arg);
 };
 
 #endif

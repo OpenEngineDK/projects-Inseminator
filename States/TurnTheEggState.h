@@ -4,41 +4,53 @@
 #include "MediPhysic.h"
 #include "SimulationState.h"
 
+#include <Core/EngineEvents.h>
+
+using namespace OpenEngine::Core;
+
 class TurnTheEggState : public SimulationState {
 private:
     MediPhysic* physic;
     TransformationNode* failedTexture;
+    IEngine& engine;
 
 public:
-    TurnTheEggState(string nextState, MediPhysic* physic) : SimulationState(nextState) {
+    TurnTheEggState(string nextState, MediPhysic* physic, IEngine& engine
+                    , StateObjects& so)
+        : SimulationState(nextState, so), engine(engine) {
         this->physic = physic;
     }
     ~TurnTheEggState() {}
 
     void Initialize() {
-        IRenderer* rendere = dynamic_cast<IRenderer*>
-	  (IGameEngine::Instance().Lookup(typeid(IRenderer)));
-        root = rendere->GetSceneRoot();      
+        root = so.GetSceneNode();
 
         root->AddNode(physic);
-        physic->Initialize();
-        IGameEngine::Instance().AddModule(*physic, IGameEngine::TICK_DEPENDENT);
-	/* physic node must be in the tree before initializing
-	   the needle, or the transparency will f... */
+        physic->Handle(InitializeEventArg());
+
+        engine.InitializeEvent().Attach(*physic);
+        //@@@todo: should be IEngine::TICK_DEPENDENT
+        engine.ProcessEvent().Attach(*physic);
+
+        engine.DeinitializeEvent().Attach(*physic);
+        // physic node must be in the tree before initializing
+        // the needle, or the transparency will f...
 
         SimulationState::Initialize(); //this also initializes the needle
     }
 
     void Deinitialize() {
         root->RemoveNode(physic);
-        IGameEngine::Instance().RemoveModule(*physic);
-	SimulationState::Deinitialize();
+        engine.InitializeEvent().Detach(*physic);
+        //@@@todo: should be IEngine::TICK_DEPENDENT
+        engine.ProcessEvent().Detach(*physic);
+        engine.DeinitializeEvent().Detach(*physic);
+
+        SimulationState::Deinitialize();
     }
 
-    bool IsTypeOf(const std::type_info& inf) { return typeid(TurnTheEggState) == inf; }
-
-    void Process(const float delta, const float percent) {
-        SimulationState::Process(delta,percent);
+    void Process(ProcessEventArg arg) {
+        SimulationState::Process(arg);
 
         Vector<3,float> dir1 = physic->GetOrientationVector(22);
         Vector<3,float> dir2 = physic->GetOrientationVector(216);

@@ -15,7 +15,7 @@
 #include <Logging/Logger.h>
 #include <Logging/StreamLogger.h>
 
-#include <Core/GameEngine.h>
+#include <Core/Engine.h>
 
 #include <Meta/GLUT.h> //TEMP ONLY FOR DRAWING WIRED SPHERE IN MediPhysic
 
@@ -33,12 +33,16 @@ int main( int argc, char** argv ) {
     logger.info << "========== Running OpenEngine Physic ========" << logger.end;
 
     // Start the engine.
-    IGameEngine& engine = GameEngine::Instance();
-    engine.SetTickTime(20); // for the MediPhysic to work properly
+    IEngine* engine = new Engine();
+    //@todo engine.SetTickTime(20); // for the MediPhysic to work properly
 
     Factory* factory = new Factory();
-    engine.Start(factory);
+    factory->SetupEngine(*engine);
+
+    engine->Start();
+
     delete factory;
+    delete engine;
 
     // Return when the engine stops.
     return EXIT_SUCCESS;
