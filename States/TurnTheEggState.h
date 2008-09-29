@@ -5,14 +5,17 @@
 #include "SimulationState.h"
 
 #include <Core/EngineEvents.h>
+#include <Utils/Timer.h>
 
 using namespace OpenEngine::Core;
+using OpenEngine::Utils::Timer;
 
 class TurnTheEggState : public SimulationState {
 private:
     MediPhysic* physic;
     TransformationNode* failedTexture;
     IEngine& engine;
+    Timer timer;
 
 public:
     TurnTheEggState(string nextState, MediPhysic* physic, IEngine& engine
@@ -25,14 +28,10 @@ public:
     void Initialize() {
         root = so.GetSceneNode();
 
+        // insert the physics node into and initialize timer
         root->AddNode(physic);
         physic->Handle(InitializeEventArg());
-
-        engine.InitializeEvent().Attach(*physic);
-        //@@@todo: should be IEngine::TICK_DEPENDENT
-        engine.ProcessEvent().Attach(*physic);
-
-        engine.DeinitializeEvent().Attach(*physic);
+        timer.Start();
         // physic node must be in the tree before initializing
         // the needle, or the transparency will f...
 
@@ -41,10 +40,7 @@ public:
 
     void Deinitialize() {
         root->RemoveNode(physic);
-        engine.InitializeEvent().Detach(*physic);
-        //@@@todo: should be IEngine::TICK_DEPENDENT
-        engine.ProcessEvent().Detach(*physic);
-        engine.DeinitializeEvent().Detach(*physic);
+        // deinitialization of physics is done by the InseminationState
 
         SimulationState::Deinitialize();
     }
@@ -73,6 +69,11 @@ public:
             //logger.info << "Egg is turned right" << logger.end;
             changeState = true;
         }
+
+        // process physics time dependend
+        const unsigned int tick = 50;
+        unsigned int t = timer.GetElapsedIntervalsAndReset(tick*1000);
+        while (t--) physic->Handle(ProcessEventArg(arg.start,tick*1000));
     }
 };
 

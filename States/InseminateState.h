@@ -4,7 +4,10 @@
 #include "MediPhysic.h"
 #include "SimulationState.h"
 
+#include <Utils/Timer.h>
 #include <Utils/Billboard.h>
+
+using OpenEngine::Utils::Timer;
 
 const float TIME_OUT = 1500;
 
@@ -14,6 +17,7 @@ private:
     TransformationNode* failedTexture;
     float time;
     bool failed;
+    Timer timer;
 public:
  InseminateState(string nextState, MediPhysic* physic, StateObjects& so)
      : SimulationState(nextState, so) {
@@ -25,10 +29,11 @@ public:
 
     void Initialize(){
         root = so.GetSceneNode();
-        root->AddNode(physic);
 
-        //@@@todo: should be IEngine::TICK_DEPENDENT
-        so.GetEngine().ProcessEvent().Attach(*physic);
+        // insert the physics node into and initialize timer
+        root->AddNode(physic);
+        // initialization of physics is done by the TurnTheEggState
+        timer.Start();
         // physic node must be in the tree before initializing
         // the needle, or the transparency will f...
 
@@ -46,8 +51,6 @@ public:
     void Deinitialize() {
         root->RemoveNode(physic);
         physic->Handle(DeinitializeEventArg());
-        //@@@todo: should be IEngine::TICK_DEPENDENT
-        so.GetEngine().ProcessEvent().Detach(*physic);
 
         if(physic->transNode!=NULL)
             root->RemoveNode(physic->transNode);
@@ -78,6 +81,11 @@ public:
             time = 0;
             failed = false;
         }
+
+        // process physics time dependend
+        const unsigned int tick = 50;
+        unsigned int t = timer.GetElapsedIntervalsAndReset(tick*1000);
+        while (t--) physic->Handle(ProcessEventArg(arg.start,tick*1000));
 
         SimulationState::Process(arg);
     }

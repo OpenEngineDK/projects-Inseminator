@@ -7,9 +7,7 @@
 // See the GNU General Public License for more details (see LICENSE). 
 //--------------------------------------------------------------------
 
-#include <Meta/OpenGL.h>
 #include <Core/IModule.h>
-//#include <Core/IGameEngine.h>
 #include <Resources/TGAResource.h>
 #include <Resources/ITextureResource.h>
 #include <Resources/ResourceManager.h>
@@ -23,7 +21,6 @@ using namespace OpenEngine::Logging;
 using namespace OpenEngine::Resources;
 using OpenEngine::Renderers::IRenderer;
 using OpenEngine::Renderers::OpenGL::TextureLoader;
-//using OpenEngine::Core::IGameEngine;
 
 Background::Background(string texturefile, ISceneNode* root) : background(NULL), root(root) {
   this->texturefile = texturefile;
