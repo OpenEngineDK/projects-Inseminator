@@ -11,7 +11,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 
 #include "Factory.h"
 
-#include "InitGLNode.h"
+//#include "InitGLNode.h"
 #include "TimedQuitEventHandler.h"
 #include "States/StateObjects.h"
 #include "States/HUDisplay.h"
@@ -32,6 +32,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Display/Camera.h>
 #include <Devices/SDLInput.h>
 
+#include <Renderers/OpenGL/LightRenderer.h>
 #include <Renderers/OpenGL/Renderer.h>
 #include <Renderers/OpenGL/RenderingView.h>
 
@@ -40,6 +41,9 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Resources/OBJResource.h>
 #include <Resources/TextureReloader.h>
 #include <Resources/TGAResource.h>
+
+#include <Scene/PointLightNode.h>
+#include <Scene/BlendingNode.h>
 
 // from extensions
 #include <Resources/IMovieResource.h>
@@ -68,6 +72,8 @@ bool Factory::SetupEngine(IEngine& engine) {
         TextureReloader* trl = new TextureReloader();
         renderer->PreProcessEvent().Attach(*trl);
 
+        renderer->PreProcessEvent().Attach(*(new LightRenderer()));
+
         // Setup input handling
         SDLInput* input = new SDLInput();
         IKeyboard* keyboard = input;
@@ -89,8 +95,19 @@ bool Factory::SetupEngine(IEngine& engine) {
         ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
 
         // Create scene root
-        ISceneNode* root = new InitGLNode();
+        BlendingNode* root = new BlendingNode();
+        root->SetSource(BlendingNode::SRC_COLOR);
+        root->SetDestination(BlendingNode::ONE);
+        root->SetEquation(BlendingNode::REVERSE_SUBTRACT);
         renderer->SetSceneRoot(root);
+
+        // Light settings.
+        PointLightNode* light0 = new PointLightNode();
+        light0->ambient = Vector<4,float>(1.0, 1.0, 1.0, 1.0);
+        TransformationNode* light0Position = new TransformationNode();
+        light0Position->SetPosition(Vector<3,float>(0.0, 0.0, 10.0));
+        light0Position->AddNode(light0);
+        root->AddNode(light0Position);
 
         StateManager* sm = new StateManager();
         StateObjects* so = 
