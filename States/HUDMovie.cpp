@@ -28,7 +28,7 @@ void HUDMovie::Initialize() {
     ((boost::shared_ptr<IListener<InitializeEventArg> >)
      mplayer)->Handle(InitializeEventArg());
 
-    so.GetTextureReloader().ListenOn( mplayer->ChangedEvent() );    
+    so.GetTextureLoader().Load( mplayer, TextureLoader::RELOAD_IMMEDIATE );    
     mplayer->Restart();
     mplayer->Pause(false);
 

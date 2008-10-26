@@ -17,7 +17,7 @@ void SelectState::Initialize() {
     for (itr = spermList->begin(); itr!=spermList->end(); itr++)
         root->AddNode( (*itr)->GetTransformation() );
 
-    normalSperm = new Spermatozoa();
+    normalSperm = new Spermatozoa(so);
     normalSperm->LoadTexture("SpermatozoaNormal.tga");
     
     failedTexture = Billboard::Create("Failed1.tga", 128, 64, 0.07);

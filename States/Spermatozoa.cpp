@@ -5,8 +5,8 @@
 
 using namespace std;
 
-Spermatozoa::Spermatozoa(bool healthy) : 
-    healthy(healthy),alive(true),marked(false),speed(-0.001f),direction(0),transNode(NULL){
+Spermatozoa::Spermatozoa(StateObjects& so, bool healthy) : 
+  so(so), healthy(healthy), alive(true),marked(false),speed(-0.001f),direction(0),transNode(NULL){
     // The little guy is dead by 30 percent chance
     alive = (rand()/(float)RAND_MAX) < 0.3f ? false : true;
     // Choose direction -1 = left, 0 = straight, 1 = right.
@@ -18,6 +18,7 @@ Spermatozoa::~Spermatozoa(){
 
 void Spermatozoa::LoadTexture(string textureName) {
     transNode = Billboard::Create(textureName, 119, 22, 0.01);
+    so.GetTextureLoader().Load(*transNode);
 }
 
 void Spermatozoa::SetSpeed(float speed) {

@@ -22,7 +22,7 @@ void SimulationState::Initialize() {
     // Load texture
     ITextureResourcePtr texture =
         ResourceManager<ITextureResource>::Create("MicroHUD.tga"); 
-    TextureLoader::LoadTextureResource(texture);
+    so.GetTextureLoader().Load(texture);
     hud = new HUDisplay(texture);
     hud->Blend(true);
     root->AddNode(hud);

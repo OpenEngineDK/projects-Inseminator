@@ -30,7 +30,7 @@ public:
         spermList->clear();
         for( int i=0; i<NUM_SPERMATOZOA; i++ )
             for( int j=0; j<NUM_SPERMATOZOA; j++ ){
-                Spermatozoa* littleGuy = new Spermatozoa(true);
+	        Spermatozoa* littleGuy = new Spermatozoa(so,true);
                 float random = (rand()/(float)RAND_MAX)*10;
                 float speed = SPERM_SPEED + (SPERM_SPEED/(float)10 * (random));
                 littleGuy->SetSpeed(speed);
@@ -43,7 +43,7 @@ public:
                 root->AddNode(littleGuy->GetTransformation());
                 spermList->push_back(littleGuy);
             }
-        spermMarked = new Spermatozoa();
+        spermMarked = new Spermatozoa(so);
         spermMarked->LoadTexture("SpermatozoaMarked.tga");
         spermMarked->Kill();
         spermMarked->Mark();

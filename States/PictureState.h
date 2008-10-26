@@ -4,15 +4,14 @@
 #include <Core/IModule.h>
 #include <Devices/IKeyboard.h>
 #include <Devices/IMouse.h>
-#include <Renderers/OpenGL/TextureLoader.h>
 #include <Logging/Logger.h>
-#include <Renderers/OpenGL/TextureLoader.h>
+#include <Renderers/TextureLoader.h>
 #include "HUDisplay.h"
 
 #include "HUDState.h"
 
 using OpenEngine::Logging::Logger;
-using OpenEngine::Renderers::OpenGL::TextureLoader;
+using OpenEngine::Renderers::TextureLoader;
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Devices;
 
@@ -37,7 +36,7 @@ public:
         // Load texture
         ITextureResourcePtr texture =
 	  ResourceManager<ITextureResource>::Create(pictureName); 
-	TextureLoader::LoadTextureResource(texture);
+	so.GetTextureLoader().Load(texture);
         hud = new HUDisplay(texture);
 
         HUDState::Initialize();

@@ -11,12 +11,12 @@
 #include <Resources/IModelResource.h>
 #include <Resources/ResourceManager.h>
 #include <Scene/ISceneNode.h>
-#include <Renderers/OpenGL/TextureLoader.h>
+#include <Renderers/TextureLoader.h>
 #include <Logging/Logger.h>
 
 
 using OpenEngine::Scene::ISceneNode;
-using OpenEngine::Renderers::OpenGL::TextureLoader;
+using OpenEngine::Renderers::TextureLoader;
 
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Logging;
@@ -37,6 +37,7 @@ private:
     IKeyboard& keyboard;
     IEngine& engine;
     ISceneNode* rootNode;
+    TextureLoader& textureLoader;
 
     bool sucking, suckedUpRight, suckEnabled;
     int lx, ly;                      // last mouse position
@@ -48,8 +49,8 @@ private:
     Spermatozoa* released;
 
 public:
- NeedleHandler(MediPhysic* mediPhysic, ISceneNode* root, IMouse* mouse, IKeyboard& keyboard, IEngine& engine) 
-     : needle(NULL), spermatozoa(NULL), mus(mouse), keyboard(keyboard), engine(engine), rootNode(root), 
+ NeedleHandler(MediPhysic* mediPhysic, ISceneNode* root, IMouse* mouse, IKeyboard& keyboard, IEngine& engine, TextureLoader& textureLoader) 
+   : needle(NULL), spermatozoa(NULL), mus(mouse), keyboard(keyboard), engine(engine), rootNode(root), textureLoader(textureLoader), 
           lx(0), ly(0), init(true), left(false), right(false),  released(NULL) {
 
         timer = 0.0f;
@@ -133,8 +134,7 @@ public:
             released = NULL;
         }
 
-        TextureLoader texLoad;
-        rootNode->Accept(texLoad);
+        textureLoader.Load(*rootNode);
     }
 
     void Deinitialize() {

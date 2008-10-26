@@ -11,7 +11,7 @@
 #include <Resources/TGAResource.h>
 #include <Resources/ITextureResource.h>
 #include <Resources/ResourceManager.h>
-#include <Renderers/OpenGL/TextureLoader.h>
+#include <Renderers/TextureLoader.h>
 #include <Renderers/IRenderer.h>
 #include <Logging/Logger.h>
 #include <Utils/Billboard.h>
@@ -20,7 +20,7 @@
 using namespace OpenEngine::Logging;
 using namespace OpenEngine::Resources;
 using OpenEngine::Renderers::IRenderer;
-using OpenEngine::Renderers::OpenGL::TextureLoader;
+using OpenEngine::Renderers::TextureLoader;
 
 Background::Background(string texturefile, ISceneNode* root) : background(NULL), root(root) {
   this->texturefile = texturefile;

@@ -39,7 +39,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Resources/DirectoryManager.h>
 #include <Resources/ResourceManager.h>
 #include <Resources/OBJResource.h>
-#include <Resources/TextureReloader.h>
+#include <Renderers/TextureLoader.h>
 #include <Resources/TGAResource.h>
 
 #include <Scene/PointLightNode.h>
@@ -69,8 +69,9 @@ bool Factory::SetupEngine(IEngine& engine) {
         engine.InitializeEvent().Attach(*renderer);
         engine.ProcessEvent().Attach(*renderer);
         engine.DeinitializeEvent().Attach(*renderer);
-        TextureReloader* trl = new TextureReloader();
-        renderer->PreProcessEvent().Attach(*trl);
+        TextureLoader* tl = new TextureLoader(*renderer);
+	renderer->InitializeEvent().Attach(*tl);
+        renderer->PreProcessEvent().Attach(*tl);
 
         renderer->PreProcessEvent().Attach(*(new LightRenderer()));
 
@@ -111,16 +112,16 @@ bool Factory::SetupEngine(IEngine& engine) {
 
         StateManager* sm = new StateManager();
         StateObjects* so = 
-            new StateObjects(root, sm, mouse, *keyboard, engine, *trl);
+            new StateObjects(root, sm, mouse, *keyboard, engine, *tl);
 
         // Create MediPhysic module handling the sphere (Eeg)
-        MediPhysic* physic = new MediPhysic(modeldir);
+        MediPhysic* physic = new MediPhysic(modeldir,*tl);
         // MediPhysics needs the full path to resources because
         // it does not use the ResourceManager to load models
         
         // Create needle handler
         NeedleHandler* needleHandler = 
-            new NeedleHandler(physic, root, mouse, *keyboard, engine);
+	  new NeedleHandler(physic, root, mouse, *keyboard, engine, *tl);
         physic->needle = needleHandler->GetTransformationNode();
 
         // Add noisy floating textures to the background
@@ -272,7 +273,6 @@ Factory::Factory() {
     viewport->SetViewingVolume(frustum);
       
     renderer = new Renderer();
-    renderer->InitializeEvent().Attach(*(new TextureLoader()));
     // Add a rendering view to the renderer
     renderer->ProcessEvent().Attach(*(new RenderingView(*viewport)));
 }

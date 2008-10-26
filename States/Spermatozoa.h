@@ -1,12 +1,12 @@
-
-
 #ifndef _SPERMATOZOA_H_
 #define _SPERMATOZOA_H_
 
-#include <string>
 #include <Math/Vector.h>
 #include <Scene/TransformationNode.h>
 #include <Resources/IModelResource.h>
+#include <string>
+
+#include "StateObjects.h"
 
 using std::string;
 using OpenEngine::Math::Vector;
@@ -15,6 +15,7 @@ using OpenEngine::Resources::IModelResourcePtr;
 
 class Spermatozoa {
 private:
+    StateObjects& so;
     bool healthy;
     bool alive;
     bool marked;
@@ -23,7 +24,7 @@ private:
     TransformationNode* transNode;
 
 public:
-    Spermatozoa(bool healthy = true);
+    Spermatozoa(StateObjects& so, bool healthy = true);
     ~Spermatozoa();
     
     void LoadTexture(string textureName);
@@ -42,6 +43,5 @@ public:
     void Kill() { alive = false; }
 
 };
-
 
 #endif
