@@ -10,12 +10,12 @@
 #ifndef _HEADS_UP_DISPLAY_MOVIE_H_
 #define _HEADS_UP_DISPLAY_MOVIE_H_
 
-#include <Renderers/IRenderNode.h>
+#include <Scene/RenderNode.h>
 #include "HUDisplay.h"
 #include <Resources/IMovieResource.h>
 #include "StateObjects.h"
 
-using OpenEngine::Scene::IRenderNode;
+using OpenEngine::Scene::RenderNode;
 using OpenEngine::Renderers::IRenderer;
 using namespace OpenEngine::Resources;
 

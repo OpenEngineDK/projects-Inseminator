@@ -34,3 +34,5 @@ win32 /libraries http://openengine.dk/data/libraries/glut-win32.zip
 win32 /libraries http://openengine.dk/data/libraries/sdl-win32.zip
 win32 /libraries http://openengine.dk/data/libraries/ffmpeg-win32.zip
 win32 /libraries http://openengine.dk/data/libraries/dlls-win32.zip
+
+darwin /libraries http://www.openengine.dk/data/libraries/ffmpeg-mac-i32.zip

@@ -73,7 +73,7 @@ void SimulationState::SetBackground(Background* bg) {
 }
 
 void SimulationState::Handle(KeyboardEventArg arg) { 
-    if( arg.sym == KEY_SPACE && arg.type == KeyboardEventArg::PRESS) {
+    if( arg.sym == KEY_SPACE && arg.type == EVENT_PRESS) {
         changeState = true;
     }
 }

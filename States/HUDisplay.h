@@ -11,15 +11,16 @@
 #define _HEADS_UP_DISPLAY_H_
 
 #include <Core/EngineEvents.h>
-#include <Renderers/IRenderNode.h>
+#include <Scene/RenderNode.h>
 #include <Renderers/IRenderingView.h>
 #include <Resources/ITextureResource.h>
 
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Resources;
 using namespace OpenEngine::Renderers;
+using namespace OpenEngine::Scene;
 
-class HUDisplay : public IRenderNode {
+class HUDisplay : public RenderNode {
 protected:
     int SCREEN_WIDTH;
     int SCREEN_HEIGHT;

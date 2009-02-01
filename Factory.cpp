@@ -70,10 +70,8 @@ bool Factory::SetupEngine(IEngine& engine) {
         engine.ProcessEvent().Attach(*renderer);
         engine.DeinitializeEvent().Attach(*renderer);
         TextureLoader* tl = new TextureLoader(*renderer);
-	renderer->InitializeEvent().Attach(*tl);
+        renderer->InitializeEvent().Attach(*tl);
         renderer->PreProcessEvent().Attach(*tl);
-
-        renderer->PreProcessEvent().Attach(*(new LightRenderer()));
 
         // Setup input handling
         SDLInput* input = new SDLInput();
@@ -272,9 +270,10 @@ Factory::Factory() {
     frustum->SetFar(1000);
     viewport->SetViewingVolume(frustum);
       
-    renderer = new Renderer();
+    renderer = new Renderer(viewport);
     // Add a rendering view to the renderer
     renderer->ProcessEvent().Attach(*(new RenderingView(*viewport)));
+    renderer->PreProcessEvent().Attach(*(new LightRenderer(*camera)));
 }
 
 Factory::~Factory() {

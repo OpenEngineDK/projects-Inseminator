@@ -48,7 +48,7 @@ public:
     }
 
     void Handle(KeyboardEventArg arg) {
-      if (arg.type == KeyboardEventArg::PRESS)
+        if (arg.type == EVENT_PRESS)
 	  HandleDownEvent(arg);
       else
 	  HandleUpEvent(arg);
