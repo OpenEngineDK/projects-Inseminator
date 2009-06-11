@@ -18,13 +18,14 @@
 #include <Core/Engine.h>
 
 #include <Meta/GLUT.h> //TEMP ONLY FOR DRAWING WIRED SPHERE IN MediPhysic
+#include <cstdlib>
 
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Logging;
 
 int main( int argc, char** argv ) {
 #ifndef __APPLE__
-    glutInit(&argc, argv);//TEMP ONLY FOR DRAWING WIRED SPHERE IN MediPhysic
+    //glutInit(&argc, argv);//TEMP ONLY FOR DRAWING WIRED SPHERE IN MediPhysic
 #endif
     // Setup logging facilities.
     Logger::AddLogger(new StreamLogger(&std::cout));
