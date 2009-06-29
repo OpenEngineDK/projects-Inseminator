@@ -43,6 +43,7 @@ public:
 
         // Load texture
         failedTexture = Billboard::Create("Failed2.tga", 128, 64, 0.07);
+        so.GetTextureLoader().Load(*failedTexture);
         failedTexture->SetPosition(Vector<3,float>(3,0,-5));
 
         failed = false;

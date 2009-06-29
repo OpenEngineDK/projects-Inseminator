@@ -10,6 +10,8 @@
 #ifndef _FACTORY_H_
 #define _FACTORY_H_
 
+#include <string>
+
 // forward declarations
 namespace OpenEngine {
     namespace Core {
@@ -39,7 +41,7 @@ private:
 public:
   Factory();
   virtual ~Factory();
-  bool         SetupEngine(IEngine& engine);
+  bool         SetupEngine(IEngine& engine, std::string startState);
   IFrame*      GetFrame();
   IRenderer*   GetRenderer();
 };

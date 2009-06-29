@@ -26,9 +26,11 @@ void SimulationState::Initialize() {
     hud = new HUDisplay(texture);
     hud->Blend(true);
     root->AddNode(hud);
+    root->AddNode(this);
 }
 
 void SimulationState::Deinitialize() {
+    root->RemoveNode(this);
     root->RemoveNode(hud);
 
     needleHandler->Deinitialize();
@@ -60,8 +62,13 @@ void SimulationState::Process(ProcessEventArg arg) {
     } else // fade up
         if (fade < 1.0) fade += fadeTime * delta;
     glClearColor(fade, fade, fade, 0.5f);
-
     BaseState::Process(arg);
+}
+
+void SimulationState::Accept(RenderingEventArg arg) {
+    // @todo: does this do anything???
+    Vector<4,float> color(fade, fade, fade, 0.5f);
+    arg.renderer.SetBackgroundColor(color);
 }
 
 void SimulationState::SetNeedle(NeedleHandler* needle) {

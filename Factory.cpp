@@ -59,7 +59,7 @@ using namespace OpenEngine::Renderers::OpenGL;
 using namespace OpenEngine::Resources;
 using namespace OpenEngine::Utils;
 
-bool Factory::SetupEngine(IEngine& engine) {
+bool Factory::SetupEngine(IEngine& engine, std::string startState) {
     try {
         engine.InitializeEvent().Attach(*frame);
         engine.ProcessEvent().Attach(*frame);
@@ -95,9 +95,11 @@ bool Factory::SetupEngine(IEngine& engine) {
 
         // Create scene root
         BlendingNode* root = new BlendingNode();
+
         root->SetSource(BlendingNode::SRC_COLOR);
         root->SetDestination(BlendingNode::ONE);
         root->SetEquation(BlendingNode::REVERSE_SUBTRACT);
+
         renderer->SetSceneRoot(root);
 
         // Light settings.
@@ -208,7 +210,7 @@ bool Factory::SetupEngine(IEngine& engine) {
 
 
         // Create and initialize StateManager
-        sm->AddStateAsInitial("StartupPicture", startup);
+        sm->AddState("StartupPicture", startup);
 
         sm->AddState("IntroState", introState);
         sm->AddState("DonateTextState", donateTextState);
@@ -231,6 +233,8 @@ bool Factory::SetupEngine(IEngine& engine) {
         sm->AddState("InseminationState", inseminateState);
         sm->AddState("InseminationSuccessState", inseminateSuccessState);
         sm->AddState("Outro", outro);
+
+        sm->SetInitialState(startState);
 
         engine.InitializeEvent().Attach(*sm);
         engine.ProcessEvent().Attach(*sm);

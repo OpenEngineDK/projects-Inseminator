@@ -32,18 +32,22 @@ int main( int argc, char** argv ) {
 
     // Print usage info.
     logger.info << "========== Running OpenEngine Physic ========" << logger.end;
+    std::string startState = "StartupPicture";
+    if (argc == 2)
+        startState = argv[1];
+    logger.info << "Start state: " << startState << logger.end;
 
     // Start the engine.
     IEngine* engine = new Engine();
     //@todo engine.SetTickTime(20); // for the MediPhysic to work properly
 
     Factory* factory = new Factory();
-    factory->SetupEngine(*engine);
+    factory->SetupEngine(*engine,startState);
 
     engine->Start();
 
-    delete factory;
-    delete engine;
+    //delete factory;
+    //delete engine;
 
     // Return when the engine stops.
     return EXIT_SUCCESS;

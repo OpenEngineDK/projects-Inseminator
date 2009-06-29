@@ -35,6 +35,15 @@ public:
         // physic node must be in the tree before initializing
         // the needle, or the transparency will f...
 
+        if (needleHandler->GetSpermatozoa() == NULL) {
+            logger.info << "no spermatozoa" << logger.end;
+	        Spermatozoa* littleGuy = new Spermatozoa(so,true);
+            littleGuy->LoadTexture("SpermatozoaNormal.tga");
+            //littleGuy->GetTransformation()->
+                //SetPosition(Vector<3,float>(-10, 0, 0));
+            needleHandler->SetSpermatozoa(littleGuy);
+        }
+
         SimulationState::Initialize(); //this also initializes the needle
     }
 
@@ -57,16 +66,21 @@ public:
         float angle1 = horiz * dir1.GetNormalize();
         float angle2 = horiz * dir2.GetNormalize();
         
+        /*
         static int c = 0;
         if (c++>10) {
             c = 0;
-            //logger.info << "dir1: " << dir1[0] << " dir2: " << dir2[0] << logger.end;
-	    //logger.info << "angle1: " << angle1 << ", angle2: " << angle2 << logger.end;
+            logger.info << "dir1: " << dir1[0]
+                        << " dir2: " << dir2[0] << logger.end;
+            logger.info << "angle1: " << angle1 
+                        << ", angle2: " << angle2 << logger.end;
         } 
+        */
+
         if( angle1 < 0.6f && angle1 > 0.2f &&
             angle2 > -0.6f && angle2 < -0.2f &&
             (dir1[0] > 1.7f || dir1[0] < 1.0f) ) {
-            //logger.info << "Egg is turned right" << logger.end;
+            //logger.info << "Egg was turned correctly" << logger.end;
             changeState = true;
         }
 

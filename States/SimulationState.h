@@ -10,11 +10,14 @@
 
 #include <Core/IListener.h>
 #include <Devices/IKeyboard.h>
+#include <Renderers/IRenderer.h>
 
 using OpenEngine::Core::IListener;
 using namespace OpenEngine::Devices;
+using namespace OpenEngine::Renderers;
 
-class SimulationState : public BaseState, public IListener<KeyboardEventArg> {
+class SimulationState : public BaseState, public IListener<KeyboardEventArg>,
+public RenderNode {
 private:
     float fade;
     float fadeTime;
@@ -34,6 +37,7 @@ public:
     void SetNeedle(NeedleHandler* needle);
     void SetBackground(Background* bg);
     void Handle(KeyboardEventArg arg);
+    void Accept(RenderingEventArg arg);
 };
 
 #endif

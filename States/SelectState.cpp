@@ -21,6 +21,7 @@ void SelectState::Initialize() {
     normalSperm->LoadTexture("SpermatozoaNormal.tga");
     
     failedTexture = Billboard::Create("Failed1.tga", 128, 64, 0.07);
+    so.GetTextureLoader().Load(*failedTexture);
     failedTexture->SetPosition(Vector<3,float>(3,0,-5));
 }
 

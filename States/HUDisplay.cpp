@@ -36,7 +36,7 @@ HUDisplay::~HUDisplay(){
 }
 
 void HUDisplay::Apply(IRenderingView* rende) {
-    if(blend) { // used for Microscope view
+    if (blend) { // used for Microscope view
         // Blend options
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_COLOR, GL_ONE);
@@ -46,8 +46,9 @@ void HUDisplay::Apply(IRenderingView* rende) {
         glDisable(GL_BLEND);
 
     ApplyOrthoView();
-    DrawInOrthoMode();
+    DrawInOrthoMode(); //fading
     ApplyProjectionView();
+
 }
 
 void HUDisplay::DrawInOrthoMode() {
@@ -108,10 +109,11 @@ void HUDisplay::ApplyOrthoView(){
 void HUDisplay::Process(ProcessEventArg arg) {
     float delta = arg.approx / 1000.0;
 
+    float blendFactor = 0.001;
     if (hasInitialized && endRequested)
-    fade += 0.001 * delta; //fade down
+    fade += blendFactor * delta; //fade down
     else if (!hasInitialized)
-        fade -= 0.001 * delta; // fade up
+        fade -= blendFactor * delta; // fade up
     if (fade <= 0.0f) { // if fully faded up
         fade = 0.0f;
         hasInitialized = true;
