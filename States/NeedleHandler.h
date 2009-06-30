@@ -57,13 +57,14 @@ public:
         suckEnabled = false;
 
         // Load Needle model
-        IModelResourcePtr mod = ResourceManager<IModelResource>::Create("Needle.obj");
+        IModelResourcePtr mod = 
+            ResourceManager<IModelResource>::Create("Needle.obj");
         mod->Load();
-        if( mod->GetSceneNode() == NULL )
+        if (mod->GetSceneNode() == NULL)
             logger.error << "Loading needle obj file failed - FaceSet is empty!" << logger.end;
         ISceneNode* gNode = mod->GetSceneNode();
-
         mod->Unload();
+
         needle = new TransformationNode();
         needle->AddNode(gNode);
     }
@@ -120,7 +121,6 @@ public:
     void Initialize() {
         suckEnabled = false;
         init = true;
-        //mus = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
 
         // Keyboard bindings
         keyboard.KeyEvent().Attach(*this);
@@ -143,7 +143,6 @@ public:
             rootNode->RemoveNode(spermatozoa->GetTransformation());
         }
         rootNode->RemoveNode(needle);
-
         keyboard.KeyEvent().Detach(*this);
     }
 

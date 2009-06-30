@@ -25,8 +25,7 @@ private:
 protected:
     NeedleHandler* needleHandler;
     Background* bg;
-    HUDisplay* hud;
-
+    HUD::Surface* surface;
     bool changeState;
 
 public:

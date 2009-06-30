@@ -34,7 +34,7 @@ public:
                 float random = (rand()/(float)RAND_MAX)*10;
                 float speed = SPERM_SPEED + (SPERM_SPEED/(float)10 * (random));
                 littleGuy->SetSpeed(speed);
-                littleGuy->LoadTexture("SpermatozoaNormal.tga");
+                littleGuy->LoadTexture("SpermatozoaNormal-withalpha.tga");
                 // Generate random numbers between 0 and 1 with 2 digits
                 float randX = (rand()/(float)RAND_MAX);
                 float randY = (rand()/(float)RAND_MAX);
@@ -44,7 +44,7 @@ public:
                 spermList->push_back(littleGuy);
             }
         spermMarked = new Spermatozoa(so);
-        spermMarked->LoadTexture("SpermatozoaMarked.tga");
+        spermMarked->LoadTexture("SpermatozoaMarked-withalpha.tga");
         spermMarked->Kill();
         spermMarked->Mark();
      }

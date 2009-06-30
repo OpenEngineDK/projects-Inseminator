@@ -41,6 +41,8 @@ void Background::Deinitialize(){
 }
 
 void Background::Process(ProcessEventArg arg) {
+    /* @todo: old lets overs, remove Process method
+
     // Update the movement of the noisy crap
     list<TransformationNode*>::iterator itr;
     for(itr = noiseList.begin(); itr!=noiseList.end(); itr++){
@@ -49,4 +51,5 @@ void Background::Process(ProcessEventArg arg) {
         radian += 0.01;
         trans->SetPosition(Vector<3,float>(sin(radian), cos(radian), 0));
     }
+    */
 }

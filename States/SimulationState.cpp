@@ -6,6 +6,7 @@ SimulationState::SimulationState(string nextState, StateObjects& so) : BaseState
         fade = 0.0f;
         fadeTime = 0.001;
         changeState = false;
+        surface = NULL;
 }
 
 void SimulationState::Initialize() {
@@ -17,21 +18,23 @@ void SimulationState::Initialize() {
 
     // Initialize all
     bg->Initialize();
-    needleHandler->Initialize(); 
+    needleHandler->Initialize();
 
     // Load texture
     ITextureResourcePtr texture =
-        ResourceManager<ITextureResource>::Create("MicroHUD.tga"); 
+        ResourceManager<ITextureResource>::Create("MicroHUD-reverted-withalpha.tga"); 
     so.GetTextureLoader().Load(texture);
-    hud = new HUDisplay(texture);
-    hud->Blend(true);
-    root->AddNode(hud);
+    
+    HUD& hud = so.GetHUD();
+    surface = hud.CreateSurface(texture);
+    surface->SetScale(HUD::Surface::FULLSCREEN);
+
     root->AddNode(this);
 }
 
 void SimulationState::Deinitialize() {
     root->RemoveNode(this);
-    root->RemoveNode(hud);
+    delete surface;
 
     needleHandler->Deinitialize();
     bg->Deinitialize();
@@ -50,7 +53,6 @@ void SimulationState::Deinitialize() {
 void SimulationState::Process(ProcessEventArg arg) {
     bg->Process(arg);
     needleHandler->Process(arg);
-    hud->Process(arg);
 
     float delta = arg.approx / 1000.0;
     if (changeState) { // fade down
@@ -61,7 +63,6 @@ void SimulationState::Process(ProcessEventArg arg) {
         }
     } else // fade up
         if (fade < 1.0) fade += fadeTime * delta;
-    glClearColor(fade, fade, fade, 0.5f);
     BaseState::Process(arg);
 }
 

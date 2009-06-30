@@ -18,9 +18,10 @@ void SelectState::Initialize() {
         root->AddNode( (*itr)->GetTransformation() );
 
     normalSperm = new Spermatozoa(so);
-    normalSperm->LoadTexture("SpermatozoaNormal.tga");
+    normalSperm->LoadTexture("SpermatozoaNormal-withalpha.tga");
     
-    failedTexture = Billboard::Create("Failed1.tga", 128, 64, 0.07);
+    failedTexture = Billboard::
+        Create("Failed1-pustud-withalpha.tga", 128, 64, 0.07);
     so.GetTextureLoader().Load(*failedTexture);
     failedTexture->SetPosition(Vector<3,float>(3,0,-5));
 }
@@ -68,7 +69,8 @@ void SelectState::Process(ProcessEventArg arg) {
     // Check if the Needle has sucked up the marked spermatozoa.
     if( needleHandler->GetSpermatozoa() != NULL && !eval ){
         eval = true;
-	if( needleHandler->SuckedUpRight() && needleHandler->GetSpermatozoa()->IsMarked() ){
+	if( needleHandler->SuckedUpRight() &&
+        needleHandler->GetSpermatozoa()->IsMarked() ){
 	    Spermatozoa* suckedUp = needleHandler->GetSpermatozoa();
 	    //logger.info << "Sucked up successfully" << logger.end;
 	    
@@ -90,7 +92,7 @@ void SelectState::Process(ProcessEventArg arg) {
     }
     if( needleHandler->GetSpermatozoa() == NULL ){
         eval = false;
-	root->RemoveNode(failedTexture);
+        root->RemoveNode(failedTexture);
     }
     CheckCollision();
 }

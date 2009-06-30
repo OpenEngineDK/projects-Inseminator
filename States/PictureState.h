@@ -30,31 +30,33 @@ public:
     ~PictureState() {}
 
     virtual void Initialize() {
-        //mouse = dynamic_cast<IMouse*>(IGameEngine::Instance().Lookup(typeid(IMouse)));
-        initMouseState = mouse->GetState();
-
         // Load texture
         ITextureResourcePtr texture =
-	  ResourceManager<ITextureResource>::Create(pictureName); 
-	so.GetTextureLoader().Load(texture);
+            ResourceManager<ITextureResource>::Create(pictureName); 
+        so.GetTextureLoader().Load(texture);
         hud = new HUDisplay(texture);
 
+        initMouseState = mouse->GetState();
         HUDState::Initialize();
     }
     
     virtual void Deinitialize() {
-	HUDState::Deinitialize();
+        HUDState::Deinitialize();
     }
 
     virtual void Process(ProcessEventArg arg) {
         //wait for mouse movement to go to the next state
         MouseState currentMouseState = mouse->GetState();
-        if(initMouseState.x==0 && initMouseState.y == 0)
-            initMouseState = mouse->GetState(); //@todo this is done because the initState is not initialized before process
-        else if ( (abs(initMouseState.x - currentMouseState.x) > 5) || (abs(initMouseState.y != currentMouseState.y) > 5) )
+        if(initMouseState.x==0 && initMouseState.y == 0) {
+            //@todo this is done because the initState is 
+            //      not initialized before process is called
+            initMouseState = mouse->GetState();
+        }
+        else if ( (abs(initMouseState.x - currentMouseState.x) > 5) ||
+                  (abs(initMouseState.y != currentMouseState.y) > 5) )
             hud->FadeDown();
 
-	HUDState::Process(arg);
+        HUDState::Process(arg);
     }
 };
 

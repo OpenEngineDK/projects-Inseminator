@@ -44,6 +44,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 
 #include <Scene/PointLightNode.h>
 #include <Scene/BlendingNode.h>
+#include <Scene/SceneNode.h>
 
 // from extensions
 #include <Resources/IMovieResource.h>
@@ -51,6 +52,9 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Utils/QuitHandler.h>
 #include <Utils/Billboard.h>
 #include <MediPhysic.h>
+
+#include <Utils/MoveHandler.h>
+#include <Display/HUD.h>
 
 using namespace OpenEngine::Display;
 using namespace OpenEngine::Devices;
@@ -93,13 +97,11 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         ResourceManager<ITextureResource>::AddPlugin(new TGAPlugin());
         ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
 
+        HUD* hud = new HUD(FRAME_WIDTH, FRAME_HEIGHT);
+        renderer->PostProcessEvent().Attach(*hud);
+
         // Create scene root
         BlendingNode* root = new BlendingNode();
-
-        root->SetSource(BlendingNode::SRC_COLOR);
-        root->SetDestination(BlendingNode::ONE);
-        root->SetEquation(BlendingNode::REVERSE_SUBTRACT);
-
         renderer->SetSceneRoot(root);
 
         // Light settings.
@@ -112,7 +114,7 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
 
         StateManager* sm = new StateManager();
         StateObjects* so = 
-            new StateObjects(root, sm, mouse, *keyboard, engine, *tl);
+            new StateObjects(root, sm, mouse, *keyboard, engine, *tl, *hud);
 
         // Create MediPhysic module handling the sphere (Eeg)
         MediPhysic* physic = new MediPhysic(modeldir,*tl);
@@ -121,11 +123,11 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         
         // Create needle handler
         NeedleHandler* needleHandler = 
-	  new NeedleHandler(physic, root, mouse, *keyboard, engine, *tl);
+            new NeedleHandler(physic, root, mouse, *keyboard, engine, *tl);
         physic->needle = needleHandler->GetTransformationNode();
 
         // Add noisy floating textures to the background
-        Background* bg = new Background("Background.tga",root);
+        Background* bg = new Background("Background.tga", root);
 
         // 01. Start up picture
         PictureState* startup = new PictureState

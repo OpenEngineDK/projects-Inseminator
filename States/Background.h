@@ -22,7 +22,7 @@ using OpenEngine::Scene::ISceneNode;
 
 class Background : public IState {
 private:
-    list<TransformationNode*> noiseList;
+    //list<TransformationNode*> noiseList;
     TransformationNode* background;
     ISceneNode* root;
     string texturefile;

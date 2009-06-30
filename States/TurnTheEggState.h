@@ -5,6 +5,7 @@
 #include "SimulationState.h"
 
 #include <Core/EngineEvents.h>
+#include <Scene/BlendingNode.h>
 #include <Utils/Timer.h>
 
 using namespace OpenEngine::Core;
@@ -16,25 +17,31 @@ private:
     TransformationNode* failedTexture;
     IEngine& engine;
     Timer timer;
-
+    BlendingNode* blendingNode;
 public:
     TurnTheEggState(string nextState, MediPhysic* physic, IEngine& engine
                     , StateObjects& so)
         : SimulationState(nextState, so), engine(engine) {
         this->physic = physic;
+        blendingNode = new BlendingNode();
+        blendingNode->SetSource(BlendingNode::SRC_COLOR);
+        blendingNode->SetDestination(BlendingNode::ONE);
+        blendingNode->SetEquation(BlendingNode::REVERSE_SUBTRACT);
     }
     ~TurnTheEggState() {}
 
     void Initialize() {
-        root = so.GetSceneNode();
+        SimulationState::Initialize(); //this also initializes the needle
 
         // insert the physics node into and initialize timer
-        root->AddNode(physic);
+        root->AddNode(blendingNode);
+        blendingNode->AddNode(physic);
         physic->Handle(InitializeEventArg());
         timer.Start();
+
+        /*
         // physic node must be in the tree before initializing
         // the needle, or the transparency will f...
-
         if (needleHandler->GetSpermatozoa() == NULL) {
             logger.info << "no spermatozoa" << logger.end;
 	        Spermatozoa* littleGuy = new Spermatozoa(so,true);
@@ -43,12 +50,13 @@ public:
                 //SetPosition(Vector<3,float>(-10, 0, 0));
             needleHandler->SetSpermatozoa(littleGuy);
         }
+        */
 
-        SimulationState::Initialize(); //this also initializes the needle
     }
 
     void Deinitialize() {
-        root->RemoveNode(physic);
+        blendingNode->RemoveNode(physic);
+        root->RemoveNode(blendingNode);
         // deinitialization of physics is done by the InseminationState
 
         SimulationState::Deinitialize();

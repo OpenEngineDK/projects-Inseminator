@@ -31,7 +31,7 @@ int main( int argc, char** argv ) {
     Logger::AddLogger(new StreamLogger(&std::cout));
 
     // Print usage info.
-    logger.info << "========== Running OpenEngine Physic ========" << logger.end;
+    logger.info << "========== Setting up Inseminator ========" << logger.end;
     std::string startState = "StartupPicture";
     if (argc == 2)
         startState = argv[1];
@@ -44,6 +44,7 @@ int main( int argc, char** argv ) {
     Factory* factory = new Factory();
     factory->SetupEngine(*engine,startState);
 
+    logger.info << "=========== Running Inseminator ==========" << logger.end;
     engine->Start();
 
     //delete factory;

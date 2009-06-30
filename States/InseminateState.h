@@ -18,31 +18,42 @@ private:
     float time;
     bool failed;
     Timer timer;
+    BlendingNode* blendingNode;
 public:
  InseminateState(string nextState, MediPhysic* physic, StateObjects& so)
      : SimulationState(nextState, so) {
         this->physic = physic;
         time = 0;
         failed = false;
+
+        blendingNode = new BlendingNode();
+        blendingNode->SetSource(BlendingNode::SRC_COLOR);
+        blendingNode->SetDestination(BlendingNode::ONE);
+        blendingNode->SetEquation(BlendingNode::REVERSE_SUBTRACT);
     }
     ~InseminateState() {}
 
     void Initialize(){
-        root = so.GetSceneNode();
+        SimulationState::Initialize(); //this also initializes the needle
 
         // insert the physics node into and initialize timer
-        root->AddNode(physic);
+        root->AddNode(blendingNode);
+        blendingNode->AddNode(physic);
+
+        // @todo: hack for the spermatazoa to be rendered after the egg
+        needleHandler->Deinitialize();
+        needleHandler->Initialize();
+
         // initialization of physics is done by the TurnTheEggState
         timer.Start();
         // physic node must be in the tree before initializing
         // the needle, or the transparency will f...
 
-        SimulationState::Initialize(); //this also initializes the needle
-
         needleHandler->EnableSuck(true);
 
         // Load texture
-        failedTexture = Billboard::Create("Failed2.tga", 128, 64, 0.07);
+        failedTexture = Billboard::
+            Create("Failed2-indimidten-withalpha.tga", 128, 64, 0.07);
         so.GetTextureLoader().Load(*failedTexture);
         failedTexture->SetPosition(Vector<3,float>(3,0,-5));
 
@@ -50,11 +61,12 @@ public:
     }
 
     void Deinitialize() {
-        root->RemoveNode(physic);
-        physic->Handle(DeinitializeEventArg());
+        blendingNode->RemoveNode(physic);
+        root->RemoveNode(blendingNode);
 
-        if(physic->transNode!=NULL)
+        if (physic->transNode != NULL)
             root->RemoveNode(physic->transNode);
+        physic->Handle(DeinitializeEventArg());
 
         SimulationState::Deinitialize();
     }
@@ -65,9 +77,11 @@ public:
         // Check if we the injecting went well
         Spermatozoa* spermatozoa = needleHandler->GetReleasedSpermatozoa();
         if (spermatozoa != NULL && !changeState && !failed) {
-            if (physic->Inject(spermatozoa->GetTransformation())) { // went well, sucess
+            if (physic->Inject(spermatozoa->GetTransformation())) {
+                // went well, sucess
                 changeState = true;
-            } else { // wrong, reset the simulation
+            } else {
+                // wrong, reset the simulation
                 root->AddNode(failedTexture);
                 failed = true;
             }
