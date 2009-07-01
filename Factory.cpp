@@ -104,6 +104,7 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         BlendingNode* root = new BlendingNode();
         renderer->SetSceneRoot(root);
 
+        /*
         // Light settings.
         PointLightNode* light0 = new PointLightNode();
         light0->ambient = Vector<4,float>(1.0, 1.0, 1.0, 1.0);
@@ -111,7 +112,7 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         light0Position->SetPosition(Vector<3,float>(0.0, 0.0, 10.0));
         light0Position->AddNode(light0);
         root->AddNode(light0Position);
-
+        */
         StateManager* sm = new StateManager();
         StateObjects* so = 
             new StateObjects(root, sm, mouse, *keyboard, engine, *tl, *hud);

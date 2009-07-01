@@ -46,34 +46,48 @@ void HUDisplay::Apply(IRenderingView* rende) {
     else // used when rendering pictures and video
         glDisable(GL_BLEND);
 */
+    GLboolean lighting = glIsEnabled(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
+
+    GLboolean depthtest = glIsEnabled(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
+
     ApplyOrthoView();
     DrawInOrthoMode(); //fading
     ApplyProjectionView();
+
+    if (lighting) glEnable(GL_LIGHTING);
+    if (depthtest) glEnable(GL_DEPTH_TEST);
+
+    //glEnable(GL_COLOR_MATERIAL);
 }
 
 void HUDisplay::DrawInOrthoMode() {
-  glBegin(GL_QUADS);
-  glColor4f(1-fade, 1-fade, 1-fade, 1);
-  if (reverseTexture) { // movies texture are reversed
-    // Display the top left point of the 2D image
-    glTexCoord2f(0.0f, 0.0f);	glVertex2f(0, 0);
-    // Display the bottom left point of the 2D image
-    glTexCoord2f(0.0f, maxY);	glVertex2f(0, SCREEN_HEIGHT);
-    // Display the bottom right point of the 2D image
-    glTexCoord2f(maxX, maxY);	glVertex2f(SCREEN_WIDTH, SCREEN_HEIGHT);
-    // Display the top right point of the 2D image
-    glTexCoord2f(maxX, 0.0f);	glVertex2f(SCREEN_WIDTH, 0);
-  } else {
-    // Display the top left point of the 2D image
-    glTexCoord2f(0.0f, maxY);	glVertex2f(0, 0);
-    // Display the bottom left point of the 2D image
-    glTexCoord2f(0.0f, 0.0f);	glVertex2f(0, SCREEN_HEIGHT);
-    // Display the bottom right point of the 2D image
-    glTexCoord2f(maxX, 0.0f);	glVertex2f(SCREEN_WIDTH, SCREEN_HEIGHT);
-    // Display the top right point of the 2D image
-    glTexCoord2f(maxX, maxY);	glVertex2f(SCREEN_WIDTH, 0);
-  }
-  glEnd();
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+
+    glBegin(GL_QUADS);
+    glColor4f(1-fade, 1-fade, 1-fade, 1);
+    if (reverseTexture) { // movies texture are reversed
+        // Display the top left point of the 2D image
+        glTexCoord2f(0.0f, 0.0f);	glVertex2f(0, 0);
+        // Display the bottom left point of the 2D image
+        glTexCoord2f(0.0f, maxY);	glVertex2f(0, SCREEN_HEIGHT);
+        // Display the bottom right point of the 2D image
+        glTexCoord2f(maxX, maxY);	glVertex2f(SCREEN_WIDTH, SCREEN_HEIGHT);
+        // Display the top right point of the 2D image
+        glTexCoord2f(maxX, 0.0f);	glVertex2f(SCREEN_WIDTH, 0);
+    } else {
+        // Display the top left point of the 2D image
+        glTexCoord2f(0.0f, maxY);	glVertex2f(0, 0);
+        // Display the bottom left point of the 2D image
+        glTexCoord2f(0.0f, 0.0f);	glVertex2f(0, SCREEN_HEIGHT);
+        // Display the bottom right point of the 2D image
+        glTexCoord2f(maxX, 0.0f);	glVertex2f(SCREEN_WIDTH, SCREEN_HEIGHT);
+        // Display the top right point of the 2D image
+        glTexCoord2f(maxX, maxY);	glVertex2f(SCREEN_WIDTH, 0);
+    }
+    glEnd();
 }
 
 void HUDisplay::ApplyOrthoView(){
@@ -90,20 +104,13 @@ void HUDisplay::ApplyOrthoView(){
     /* Pass in our 2D ortho screen coordinates.like
        so (left, right, bottom, top).  The last
        2 parameters are the near and far planes. */
-    glOrtho( 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 1 );	
+    glOrtho( 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 1 );
     
     // Switch to model view so that we can render the scope image
     glMatrixMode(GL_MODELVIEW);
 
     // Initialize the current model view matrix with the identity matrix
-    glLoadIdentity();					
-  
-    glEnable(GL_TEXTURE_2D);
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-
-    glBindTexture(GL_TEXTURE_2D, textureId);
+    glLoadIdentity();
 }
 
 void HUDisplay::Process(ProcessEventArg arg) {
@@ -133,9 +140,6 @@ bool HUDisplay::Ended() {
 }
 
 void HUDisplay::ApplyProjectionView() {
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-
     // Enter into our projection matrix mode
     glMatrixMode( GL_PROJECTION );
     
@@ -146,7 +150,4 @@ void HUDisplay::ApplyProjectionView() {
     // Go back to our model view matrix like normal
     glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
-    
-    glEnable(GL_LIGHTING);
-    glEnable(GL_COLOR_MATERIAL);
 }

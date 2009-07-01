@@ -16,11 +16,12 @@ using OpenEngine::Core::IListener;
 using namespace OpenEngine::Devices;
 using namespace OpenEngine::Renderers;
 
-class SimulationState : public BaseState, public IListener<KeyboardEventArg>,
-public RenderNode {
+class SimulationState : public BaseState, public IListener<KeyboardEventArg> {
 private:
-    float fade;
+    float time;
     float fadeTime;
+    LightNode* light;
+    TransformationNode* lightPosition;
 
 protected:
     NeedleHandler* needleHandler;
@@ -36,7 +37,6 @@ public:
     void SetNeedle(NeedleHandler* needle);
     void SetBackground(Background* bg);
     void Handle(KeyboardEventArg arg);
-    void Accept(RenderingEventArg arg);
 };
 
 #endif

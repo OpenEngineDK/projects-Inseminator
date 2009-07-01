@@ -1,16 +1,29 @@
 #include "SimulationState.h"
 
+#include <Scene/PointLightNode.h>
+
 static const bool skipKeyEnabled = false;
 
-SimulationState::SimulationState(string nextState, StateObjects& so) : BaseState(nextState, so) {
-        fade = 0.0f;
-        fadeTime = 0.001;
-        changeState = false;
-        surface = NULL;
+SimulationState::SimulationState(string nextState, StateObjects& so)
+    : BaseState(nextState, so) {
+    time = 0.0f;
+    fadeTime = 850; //millisecs
+    changeState = false;
+    surface = NULL;
+
+    light = new PointLightNode();
+    Vector<4,float> color(0.0f, 0.0f, 0.0f, 1.0f);
+    light->ambient = color;
+    light->diffuse = light->specular = color; 
+    lightPosition = new TransformationNode();
+    lightPosition->SetPosition(Vector<3,float>(0.0, 0.0, -100.0));
+    lightPosition->AddNode(light);
 }
 
 void SimulationState::Initialize() {
     BaseState::Initialize();
+
+    root->AddNode(lightPosition);
 
     // Subscribe for keyevents
     if(skipKeyEnabled)
@@ -28,12 +41,9 @@ void SimulationState::Initialize() {
     HUD& hud = so.GetHUD();
     surface = hud.CreateSurface(texture);
     surface->SetScale(HUD::Surface::FULLSCREEN);
-
-    root->AddNode(this);
 }
 
 void SimulationState::Deinitialize() {
-    root->RemoveNode(this);
     delete surface;
 
     needleHandler->Deinitialize();
@@ -44,7 +54,7 @@ void SimulationState::Deinitialize() {
         so.GetKeyboard().KeyEvent().Detach(*this);
 
     changeState = false; // reset changeState
-    fade = 0.0f; // reset fade
+    time = 0.0f; // reset fade
     
     BaseState::Deinitialize();
     needleHandler->Deinitialize(); //??? deinit again?
@@ -54,22 +64,26 @@ void SimulationState::Process(ProcessEventArg arg) {
     bg->Process(arg);
     needleHandler->Process(arg);
 
-    float delta = arg.approx / 1000.0;
+    float delta = arg.approx / 1000.0; // millisecs
     if (changeState) { // fade down
-        if (fade > 0.0) fade -= fadeTime * delta;
-        if (fade < 0.000001) { // when faded down change to next state
+        if (time > 0.0) time -= delta;
+        if (time <= 0.0) { // when faded down change to next state
+            root->RemoveNode(lightPosition);
             NextState();
             return;
         }
     } else // fade up
-        if (fade < 1.0) fade += fadeTime * delta;
-    BaseState::Process(arg);
-}
+        if (time < fadeTime) time += delta;
 
-void SimulationState::Accept(RenderingEventArg arg) {
-    // @todo: does this do anything???
-    Vector<4,float> color(fade, fade, fade, 0.5f);
-    arg.renderer.SetBackgroundColor(color);
+    if (time < 0.0) time = 0.0;
+    else if (time > fadeTime) time = fadeTime;
+
+    float fade = time / fadeTime;
+    Vector<4,float> color(fade, fade, fade, 1.0f);
+    light->ambient = color;
+    light->diffuse = light->specular = color; 
+
+    BaseState::Process(arg);
 }
 
 void SimulationState::SetNeedle(NeedleHandler* needle) {
