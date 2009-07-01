@@ -45,6 +45,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Scene/PointLightNode.h>
 #include <Scene/BlendingNode.h>
 #include <Scene/SceneNode.h>
+#include <Scene/RenderStateNode.h>
 
 // from extensions
 #include <Resources/IMovieResource.h>
@@ -100,19 +101,15 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         HUD* hud = new HUD(FRAME_WIDTH, FRAME_HEIGHT);
         renderer->PostProcessEvent().Attach(*hud);
 
+        RenderStateNode* rsn = new RenderStateNode();
+        rsn->DisableOption(RenderStateNode::SHADER);
+        rsn->EnableOption(RenderStateNode::LIGHTING);
+        renderer->SetSceneRoot(rsn);
+
         // Create scene root
         BlendingNode* root = new BlendingNode();
-        renderer->SetSceneRoot(root);
-
-        /*
-        // Light settings.
-        PointLightNode* light0 = new PointLightNode();
-        light0->ambient = Vector<4,float>(1.0, 1.0, 1.0, 1.0);
-        TransformationNode* light0Position = new TransformationNode();
-        light0Position->SetPosition(Vector<3,float>(0.0, 0.0, 10.0));
-        light0Position->AddNode(light0);
-        root->AddNode(light0Position);
-        */
+        rsn->AddNode(root);
+        
         StateManager* sm = new StateManager();
         StateObjects* so = 
             new StateObjects(root, sm, mouse, *keyboard, engine, *tl, *hud);
@@ -250,6 +247,16 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
 
         QuitHandler* quit_h = new QuitHandler(engine);
         keyboard->KeyEvent().Attach(*quit_h);
+
+        /* for demo mode
+        MoveHandler* move_h = 
+            new MoveHandler(*camera, *mouse);
+        move_h->SetObjectMove(false);
+        keyboard->KeyEvent().Attach(*move_h);
+        engine.InitializeEvent().Attach(*move_h);
+        engine.ProcessEvent().Attach(*move_h);
+        engine.DeinitializeEvent().Attach(*move_h);
+        */
 
     } catch (const Exception& ex) {
         logger.error << "An exception occurred: " << ex.what() << logger.end;
