@@ -43,5 +43,5 @@ darwin /libraries http://www.openengine.dk/data/libraries/ffmpeg-mac-i32.zip
 any /projects/Inseminator/data    http://www.openengine.dk/data/projects/Inseminator/billboards.tar.gz
 any /projects/Inseminator/data    http://www.openengine.dk/data/projects/Inseminator/models.tar.gz
 any /projects/Inseminator/data    http://www.openengine.dk/data/projects/Inseminator/picturemovies.tar.gz
-any /projects/Inseminator/data    http://www.openengine.dk/data/projects/Inseminator/Intro.mov
-any /projects/Inseminator/data    http://www.openengine.dk/data/projects/Inseminator/Outro.mov
+any /projects/Inseminator/data/movies    http://www.openengine.dk/data/projects/Inseminator/Intro.mov
+any /projects/Inseminator/data/movies    http://www.openengine.dk/data/projects/Inseminator/Outro.mov
