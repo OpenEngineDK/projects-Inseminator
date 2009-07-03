@@ -85,7 +85,7 @@ MovieState* Factory::CreateMState(std::string file, std::string nextState,
         IMovieResourcePtr introStateMovie = 
             ResourceManager<IMovieResource>::Create(file);
         MovieState* introState = new MovieState
-            (introStateMovie, nextState, continueToNextState, *so);
+            (introStateMovie, nextState, true, *so, continueToNextState);
         return introState;
 }
 

@@ -44,7 +44,7 @@ private:
   MovieState* CreatePMState(std::string file, std::string nextState, 
                             float duration);
   MovieState* CreateMState(std::string file, std::string nextState, 
-                            bool continueToNextState = true);
+                            bool continueToNextState = false);
   public:
   Factory();
   virtual ~Factory();
