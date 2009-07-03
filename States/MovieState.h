@@ -18,18 +18,18 @@ private:
     HUDMovie* movie;
 
 public:
- MovieState(string movieName, string nextState, StateObjects& so, 
-            bool restart = false) : HUDState(nextState, so, restart) {
-        IMovieResourcePtr mplayer = 
-	  ResourceManager<IMovieResource>::Create(movieName);
-        movie = new HUDMovie(mplayer, so);
-	hud = movie;
+ MovieState(IMovieResourcePtr mplayer, string nextState, 
+            bool reverseTexture, StateObjects& so, 
+            bool restart = false) 
+     : HUDState(nextState, so, restart) {
+        movie = new HUDMovie(mplayer, so, reverseTexture);
+        hud = movie;
     }
     ~MovieState() {}
 
     virtual void Initialize(){
         movie->Initialize();
-	HUDState::Initialize();
+        HUDState::Initialize();
     }
     
     virtual void Deinitialize() {

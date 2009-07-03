@@ -25,7 +25,7 @@ private:
     StateObjects& so;
 
 public:
-    HUDMovie(IMovieResourcePtr mplayer, StateObjects& so);
+    HUDMovie(IMovieResourcePtr mplayer, StateObjects& so, bool reverseTexture);
     ~HUDMovie();
 
     // Only for processing the movie decoding

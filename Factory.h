@@ -11,6 +11,8 @@
 #define _FACTORY_H_
 
 #include <string>
+#include "States/StateObjects.h"
+#include "States/MovieState.h"
 
 // forward declarations
 namespace OpenEngine {
@@ -37,8 +39,13 @@ private:
   IRenderer* renderer;
   Viewport*  viewport;
   Camera*    camera;
+  StateObjects* so;
   
-public:
+  MovieState* CreatePMState(std::string file, std::string nextState, 
+                            float duration);
+  MovieState* CreateMState(std::string file, std::string nextState, 
+                            bool continueToNextState = true);
+  public:
   Factory();
   virtual ~Factory();
   bool         SetupEngine(IEngine& engine, std::string startState);

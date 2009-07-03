@@ -3,6 +3,7 @@
 #include <Scene/PointLightNode.h>
 
 static const bool skipKeyEnabled = false;
+static const float ACTIVE_TIMEOUT = 30000.0f; // if user sucks - goto next stage
 
 SimulationState::SimulationState(string nextState, StateObjects& so)
     : BaseState(nextState, so) {
@@ -10,6 +11,7 @@ SimulationState::SimulationState(string nextState, StateObjects& so)
     fadeTime = 850; //millisecs
     changeState = false;
     surface = NULL;
+    stateClock = 0.0;
 
     light = new PointLightNode();
     Vector<4,float> color(0.0f, 0.0f, 0.0f, 1.0f);
@@ -35,7 +37,7 @@ void SimulationState::Initialize() {
 
     // Load texture
     ITextureResourcePtr texture =
-        ResourceManager<ITextureResource>::Create("MicroHUD-reverted-withalpha.tga"); 
+        ResourceManager<ITextureResource>::Create("MicroHUD-reverted-withalpha.png"); 
     so.GetTextureLoader().Load(texture);
     
     HUD& hud = so.GetHUD();
@@ -55,7 +57,8 @@ void SimulationState::Deinitialize() {
 
     changeState = false; // reset changeState
     time = 0.0f; // reset fade
-    
+    stateClock = 0.0; // reset state clock
+
     BaseState::Deinitialize();
     needleHandler->Deinitialize(); //??? deinit again?
 }
@@ -65,6 +68,9 @@ void SimulationState::Process(ProcessEventArg arg) {
     needleHandler->Process(arg);
 
     float delta = arg.approx / 1000.0; // millisecs
+    stateClock += delta;
+    if (stateClock > ACTIVE_TIMEOUT)
+        changeState = true;
     if (changeState) { // fade down
         if (time > 0.0) time -= delta;
         if (time <= 0.0) { // when faded down change to next state

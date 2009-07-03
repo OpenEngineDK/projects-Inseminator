@@ -3,6 +3,7 @@
 
 #include "Spermatozoa.h"
 #include "MediPhysic.h"
+#include "StateObjects.h"
 
 #include <Core/IEngine.h>
 #include <Core/IState.h>
@@ -24,8 +25,13 @@ using namespace OpenEngine::Resources;
 using namespace OpenEngine::Devices;
 
 static const float speed = 0.05f;
-static const float MAX_TIME = 120000.0; // in millisecs
-static const float MAX_MOUSE_SPEED = 0.33;
+static const float MAX_TIME = 30000.0; // in millisecs
+static const float MAX_MOUSE_SPEED = 0.36; // former 0.33
+
+// initialize spermatazoa list
+const float SPERM_SPEED = -0.0007f;
+const int NUM_SPERMATOZOA = 6;
+const int SEED = 0;
 
 class NeedleHandler : public IState, public IListener<KeyboardEventArg> {
 private:
@@ -183,8 +189,9 @@ public:
         }
 
         // bounderies on x- and y-axis for the needle
-        //const float minX = -6, maxX = 12, minY = -5.5, maxY = 5.5;
-        const float minX = -2, maxX = 8, minY = -6.5, maxY = 6.5;
+        //first: const float minX = -6, maxX = 12, minY = -5.5, maxY = 5.5;
+        //second: const float minX = -2, maxX = 8, minY = -6.5, maxY = 6.5;
+        const float minX = -2, maxX = 8, minY = -5.0, maxY = 5.0;
 
         // satisfy bounderies on x-axis for the needle
         Vector<3,float> position = needle->GetPosition();
@@ -209,6 +216,29 @@ public:
         }
         needle->SetPosition(Vector<3,float>(5, 1, 0.0));
         released = NULL;
+    }
+
+    list<Spermatozoa*>* InitializeSpermatazoaList(StateObjects& so) {
+        list<Spermatozoa*>* spermList;
+        spermList = new list<Spermatozoa*>();
+        srand((unsigned)SEED);
+        // Create list of spermatozoa's
+        spermList->clear();
+        for( int i=0; i<NUM_SPERMATOZOA; i++ )
+            for( int j=0; j<NUM_SPERMATOZOA; j++ ){
+                Spermatozoa* littleGuy = new Spermatozoa(so,true);
+                float random = (rand()/(float)RAND_MAX)*10;
+                float speed = SPERM_SPEED + (SPERM_SPEED/(float)10 * (random));
+                littleGuy->SetSpeed(speed);
+                littleGuy->LoadTexture("SpermatozoaNormal-withalpha.png");
+                // Generate random numbers between 0 and 1 with 2 digits
+                float randX = (rand()/(float)RAND_MAX);
+                float randY = (rand()/(float)RAND_MAX);
+                littleGuy->GetTransformation()->SetRotation(Quaternion<float>(Vector<3,float>(randX-0.5,randY-0.5,0).GetNormalize()));
+                littleGuy->SetPosition(Vector<3,float>(4-j+randX, 3-i+randY,-0.1));
+                spermList->push_back(littleGuy);
+            }
+        return spermList;
     }
 
     void HandleKeys(){

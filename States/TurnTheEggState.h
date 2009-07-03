@@ -6,6 +6,7 @@
 
 #include <Core/EngineEvents.h>
 #include <Scene/BlendingNode.h>
+#include <Utils/Billboard.h>
 #include <Utils/Timer.h>
 
 using namespace OpenEngine::Core;
@@ -15,14 +16,17 @@ class TurnTheEggState : public SimulationState {
 private:
     MediPhysic* physic;
     TransformationNode* failedTexture;
+    TransformationNode* infoTexture;
     IEngine& engine;
     Timer timer;
     BlendingNode* blendingNode;
+    bool infoTextIsVisible;
 public:
     TurnTheEggState(string nextState, MediPhysic* physic, IEngine& engine
                     , StateObjects& so)
         : SimulationState(nextState, so), engine(engine) {
         this->physic = physic;
+
         blendingNode = new BlendingNode();
         blendingNode->SetSource(BlendingNode::SRC_COLOR);
         blendingNode->SetDestination(BlendingNode::ONE);
@@ -33,31 +37,40 @@ public:
     void Initialize() {
         SimulationState::Initialize(); //this also initializes the needle
 
+        // information image
+        infoTexture = Billboard::
+            Create("TurnTheEggInfo-withalpha.png", 128, 64, 0.05);
+        infoTexture->SetPosition(Vector<3,float>(3,-3,-5));
+        infoTextIsVisible = false;
+        so.GetTextureLoader().Load(*infoTexture);
+
         // insert the physics node into and initialize timer
         root->AddNode(blendingNode);
         blendingNode->AddNode(physic);
         physic->Handle(InitializeEventArg());
         timer.Start();
 
-        /*
-        // physic node must be in the tree before initializing
-        // the needle, or the transparency will f...
+        // if needle does not have a spermatazoa, add one
         if (needleHandler->GetSpermatozoa() == NULL) {
-            logger.info << "no spermatozoa" << logger.end;
 	        Spermatozoa* littleGuy = new Spermatozoa(so,true);
-            littleGuy->LoadTexture("SpermatozoaNormal.tga");
-            //littleGuy->GetTransformation()->
-                //SetPosition(Vector<3,float>(-10, 0, 0));
+            littleGuy->LoadTexture("SpermatozoaNormal-withalpha.png");
+            littleGuy->GetTransformation()->
+                SetPosition(Vector<3,float>(0, 0, 0));
             needleHandler->SetSpermatozoa(littleGuy);
-        }
-        */
 
+            // offset the spermztozoa inside the needle
+            needleHandler->GetSpermatozoa()->
+                GetTransformation()->Move(2.0f, 0,0);
+        }
     }
 
     void Deinitialize() {
         blendingNode->RemoveNode(physic);
         root->RemoveNode(blendingNode);
         // deinitialization of physics is done by the InseminationState
+
+		if (infoTextIsVisible)
+            root->RemoveNode(infoTexture);
 
         SimulationState::Deinitialize();
     }
@@ -96,6 +109,11 @@ public:
         const unsigned int tick = 50;
         unsigned int t = timer.GetElapsedIntervalsAndReset(tick*1000);
         while (t--) physic->Handle(ProcessEventArg(arg.start,tick*1000));
+
+        if (stateClock > 10000 && !infoTextIsVisible) {
+            root->AddNode(infoTexture);
+            infoTextIsVisible = true;
+        }
     }
 };
 

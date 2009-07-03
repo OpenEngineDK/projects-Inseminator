@@ -38,7 +38,7 @@ TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
   # Extension dependencies
   Extensions_OpenGLRenderer
   Extensions_HUD
-  Extensions_TGAResource
+  Extensions_SDLImage
   Extensions_OBJResource
   Extensions_SDL
   Extensions_StateManager

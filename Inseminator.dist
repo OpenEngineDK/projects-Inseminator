@@ -14,7 +14,7 @@ darcs /extensions/OpenGLRenderer  http://openengine.dk/code/extensions/OpenGLRen
 darcs /extensions/GenericHandlers http://openengine.dk/code/extensions/GenericHandlers
 darcs /extensions/HUD             http://openengine.dk/code/extensions/HUD
 darcs /extensions/OBJResource     http://openengine.dk/code/extensions/OBJResource
-darcs /extensions/TGAResource     http://openengine.dk/code/extensions/TGAResource
+darcs /extensions/SDLImage     http://openengine.dk/code/extensions/SDLImage
 darcs /extensions/FFMPEGResource  http://openengine.dk/code/extensions/FFMPEGResource
 darcs /extensions/StateManager    http://openengine.dk/code/extensions/StateManager
 darcs /extensions/MediPhysics     http://openengine.dk/code/extensions/MediPhysics
@@ -24,7 +24,7 @@ darcs-dev /extensions/OpenGLRenderer  fh.daimi.au.dk:/users/cgd/code/extensions/
 darcs-dev /extensions/GenericHandlers fh.daimi.au.dk:/users/cgd/code/extensions/GenericHandlers
 darcs-dev /extensions/HUD             fh.daimi.au.dk:/users/cgd/code/extensions/HUD
 darcs-dev /extensions/OBJResource     fh.daimi.au.dk:/users/cgd/code/extensions/OBJResource
-darcs-dev /extensions/TGAResource     fh.daimi.au.dk:/users/cgd/code/extensions/TGAResource
+darcs-dev /extensions/SDLImage     fh.daimi.au.dk:/users/cgd/code/extensions/SDLImage
 darcs-dev /extensions/FFMPEGResource  fh.daimi.au.dk:/users/cgd/code/extensions/FFMPEGResource
 darcs-dev /extensions/StateManager    fh.daimi.au.dk:/users/cgd/code/extensions/StateManager
 darcs-dev /extensions/MediPhysics     fh.daimi.au.dk:/users/cgd/code/extensions/MediPhysics

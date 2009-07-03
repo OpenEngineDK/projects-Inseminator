@@ -7,10 +7,10 @@
 using namespace OpenEngine;
 using namespace OpenEngine::Core;
 
-HUDMovie::HUDMovie(IMovieResourcePtr movie, StateObjects& so) :
+HUDMovie::HUDMovie(IMovieResourcePtr movie, StateObjects& so, bool reverseTex) :
     HUDisplay(movie->GetMovieWidth(),movie->GetMovieHeight()), so(so) {
+    reverseTexture = reverseTex;
     mplayer = movie;
-    reverseTexture = true;
 
     blend = false;
     hasInitialized = false;

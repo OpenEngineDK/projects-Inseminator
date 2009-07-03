@@ -28,6 +28,7 @@ protected:
     Background* bg;
     HUD::Surface* surface;
     bool changeState;
+    float stateClock;
 
 public:
     SimulationState(string nextState, StateObjects& so);

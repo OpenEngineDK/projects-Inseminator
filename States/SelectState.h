@@ -9,7 +9,7 @@ private:
     Spermatozoa* chosenOne;
     Spermatozoa* normalSperm;
     TransformationNode* failedTexture;
-    bool eval;
+    bool eval, failedTextIsVisible;
 public:
     SelectState(string nextState, StateObjects& so);
     ~SelectState();

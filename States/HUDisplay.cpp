@@ -46,20 +46,26 @@ void HUDisplay::Apply(IRenderingView* rende) {
     else // used when rendering pictures and video
         glDisable(GL_BLEND);
 */
+    CHECK_FOR_GL_ERROR();
     GLboolean lighting = glIsEnabled(GL_LIGHTING);
     glDisable(GL_LIGHTING);
 
     GLboolean depthtest = glIsEnabled(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_TEST);
 
+    CHECK_FOR_GL_ERROR();
     ApplyOrthoView();
+    CHECK_FOR_GL_ERROR();
     DrawInOrthoMode(); //fading
+    CHECK_FOR_GL_ERROR();
     ApplyProjectionView();
+    CHECK_FOR_GL_ERROR();
 
     if (lighting) glEnable(GL_LIGHTING);
     if (depthtest) glEnable(GL_DEPTH_TEST);
 
     //glEnable(GL_COLOR_MATERIAL);
+    CHECK_FOR_GL_ERROR();
 }
 
 void HUDisplay::DrawInOrthoMode() {
@@ -91,6 +97,7 @@ void HUDisplay::DrawInOrthoMode() {
 }
 
 void HUDisplay::ApplyOrthoView(){
+    CHECK_FOR_GL_ERROR();
     glPushMatrix();
     glMatrixMode(GL_PROJECTION);
 
@@ -104,7 +111,9 @@ void HUDisplay::ApplyOrthoView(){
     /* Pass in our 2D ortho screen coordinates.like
        so (left, right, bottom, top).  The last
        2 parameters are the near and far planes. */
+    CHECK_FOR_GL_ERROR();
     glOrtho( 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 1 );
+    CHECK_FOR_GL_ERROR();
     
     // Switch to model view so that we can render the scope image
     glMatrixMode(GL_MODELVIEW);

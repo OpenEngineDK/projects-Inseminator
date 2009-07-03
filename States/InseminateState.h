@@ -9,7 +9,7 @@
 
 using OpenEngine::Utils::Timer;
 
-const float TIME_OUT = 1500;
+const float TIME_OUT = 4000;
 
 class InseminateState : public SimulationState {
 private:
@@ -38,6 +38,7 @@ public:
 
         // insert the physics node into and initialize timer
         root->AddNode(blendingNode);
+        physic->Handle(InitializeEventArg());
         blendingNode->AddNode(physic);
 
         // @todo: hack for the spermatazoa to be rendered after the egg
@@ -53,11 +54,24 @@ public:
 
         // Load texture
         failedTexture = Billboard::
-            Create("Failed2-indimidten-withalpha.tga", 128, 64, 0.07);
+            Create("Failed2-indimidten-withalpha.png", 128, 64, 0.07);
         so.GetTextureLoader().Load(*failedTexture);
         failedTexture->SetPosition(Vector<3,float>(3,0,-5));
 
         failed = false;
+
+        // if needle does not have a spermatazoa, add one
+        if (needleHandler->GetSpermatozoa() == NULL) {
+	        Spermatozoa* littleGuy = new Spermatozoa(so,true);
+            littleGuy->LoadTexture("SpermatozoaNormal-withalpha.png");
+            littleGuy->GetTransformation()->
+                SetPosition(Vector<3,float>(0, 0, 0));
+            needleHandler->SetSpermatozoa(littleGuy);
+
+            // offset the spermztozoa inside the needle
+            needleHandler->GetSpermatozoa()->
+                GetTransformation()->Move(2.0f, 0,0);
+        }
     }
 
     void Deinitialize() {

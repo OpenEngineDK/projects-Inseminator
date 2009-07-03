@@ -11,9 +11,9 @@ static const int RESET_TIME = 20000; // in milli seconds
 
 #include "Factory.h"
 
+#include "PictureMovieResource.h"
 //#include "InitGLNode.h"
 #include "TimedQuitEventHandler.h"
-#include "States/StateObjects.h"
 #include "States/HUDisplay.h"
 #include "States/Background.h"
 
@@ -22,7 +22,6 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include "States/InseminateState.h"
 #include "States/SelectState.h"
 
-#include "States/MovieState.h"
 #include "States/PictureState.h"
 #include "States/NeedleHandler.h"
 
@@ -40,7 +39,7 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Resources/ResourceManager.h>
 #include <Resources/OBJResource.h>
 #include <Renderers/TextureLoader.h>
-#include <Resources/TGAResource.h>
+#include <Resources/SDLImage.h>
 
 #include <Scene/PointLightNode.h>
 #include <Scene/BlendingNode.h>
@@ -57,6 +56,9 @@ static const int RESET_TIME = 20000; // in milli seconds
 #include <Utils/MoveHandler.h>
 #include <Display/HUD.h>
 
+#include <Meta/OpenGL.h>
+#include <Meta/SDL.h>
+
 using namespace OpenEngine::Display;
 using namespace OpenEngine::Devices;
 using namespace OpenEngine::Scene;
@@ -64,11 +66,42 @@ using namespace OpenEngine::Renderers::OpenGL;
 using namespace OpenEngine::Resources;
 using namespace OpenEngine::Utils;
 
+MovieState* Factory::CreatePMState(std::string file, std::string nextState, 
+                                   float duration) {
+        ITextureResourcePtr donateTextStateTexture = 
+            ResourceManager<ITextureResource>::Create(file);
+        donateTextStateTexture->Load();
+        IMovieResourcePtr donateTextStateMovie = IMovieResourcePtr
+            (new PictureMovieResource(donateTextStateTexture ,duration));
+        //IMovieResourcePtr donateTextStateMovie = 
+        //  ResourceManager<IMovieResource>::Create("DonateText.mov");
+        MovieState* donateTextState = new MovieState
+            (donateTextStateMovie, nextState, false, *so);
+        return donateTextState;
+}
+
+MovieState* Factory::CreateMState(std::string file, std::string nextState, 
+                                   bool continueToNextState) {
+        IMovieResourcePtr introStateMovie = 
+            ResourceManager<IMovieResource>::Create(file);
+        MovieState* introState = new MovieState
+            (introStateMovie, nextState, continueToNextState, *so);
+        return introState;
+}
+
 bool Factory::SetupEngine(IEngine& engine, std::string startState) {
     try {
         engine.InitializeEvent().Attach(*frame);
         engine.ProcessEvent().Attach(*frame);
         engine.DeinitializeEvent().Attach(*frame);
+
+        /*
+        // Hack to avoid white flash at startup
+        ((SDLFrame*)frame)->Handle(InitializeEventArg());
+        Vector<4,float> bgc(0.0, 0.0, 0.0, 1.0);
+        glClearColor(bgc[0], bgc[1], bgc[2], bgc[3]);
+        SDL_GL_SwapBuffers();
+        */
 
         // setup renderer
         engine.InitializeEvent().Attach(*renderer);
@@ -86,16 +119,21 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         engine.ProcessEvent().Attach(*input);
         engine.DeinitializeEvent().Attach(*input);
 
+
         string resourcedir = "./projects/Inseminator/data/";
         logger.info << "Resource directory: " << resourcedir << logger.end;
         string modeldir = resourcedir + "models/";
         DirectoryManager::AppendPath(modeldir);
-        string videodir = resourcedir + "videos/";
-        DirectoryManager::AppendPath(videodir);
+        string billboardsdir = resourcedir + "billboards/";
+        DirectoryManager::AppendPath(billboardsdir);
+        string moviesdir = resourcedir + "movies/";
+        DirectoryManager::AppendPath(moviesdir);
+        string picturemoviesdir = resourcedir + "picturemovies/";
+        DirectoryManager::AppendPath(picturemoviesdir);
         
         // load the resource plug-ins
         ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
-        ResourceManager<ITextureResource>::AddPlugin(new TGAPlugin());
+        ResourceManager<ITextureResource>::AddPlugin(new SDLImagePlugin());
         ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
 
         HUD* hud = new HUD(FRAME_WIDTH, FRAME_HEIGHT);
@@ -111,8 +149,7 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         rsn->AddNode(root);
         
         StateManager* sm = new StateManager();
-        StateObjects* so = 
-            new StateObjects(root, sm, mouse, *keyboard, engine, *tl, *hud);
+        so = new StateObjects(root, sm, mouse, *keyboard, engine, *tl, *hud);
 
         // Create MediPhysic module handling the sphere (Eeg)
         MediPhysic* physic = new MediPhysic(modeldir,*tl);
@@ -125,60 +162,72 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         physic->needle = needleHandler->GetTransformationNode();
 
         // Add noisy floating textures to the background
-        Background* bg = new Background("Background.tga", root);
+        Background* bg = new Background("Background.png", root);
 
         // 01. Start up picture
         PictureState* startup = new PictureState
-            ("Intro.tga", "IntroState", *so);
-        
+            ("Intro.png", "IntroState", *so);
+
         // 02. Intro (Video)
-        MovieState* introState = new MovieState
-            ("Intro.mov", "DonateTextState", *so);
-        
+        MovieState* introState = 
+            CreateMState("Intro.mov", "DonateTextState");
+
         // 03. "Morten has Donated" (Video)
-        MovieState* donateTextState = new MovieState
-            ("DonateText.mov", "DonateState", *so);
-        
+        MovieState* donateTextState =
+            //CreateMState("DonateText.mov", "DonateState");
+            CreatePMState("DonateText.png", "DonateState", 9800);
+
         // 04.
-        MovieState* donateState = new MovieState
-            ("Donate.mov", "HitTheLittleGuyText1", *so);
-        
+        MovieState* donateState = 
+            //CreateMState("Donate.mov", "HitTheLittleGuyText1");
+            CreatePMState("Donate.png", "HitTheLittleGuyText1", 7990);
+
         // 05.
-        MovieState* hitText1 = new MovieState
-            ("HitTheLittleGuyText1.mov", "HitTheLittleGuyText2", *so);
+        MovieState* hitText1 =
+            //CreateMState("HitTheLittleGuyText1.mov", "HitTheLittleGuyText2");
+            CreatePMState("HitTheLittleGuyText1.png", "HitTheLittleGuyText2",9880);
         
         // 06.
-        MovieState* hitText2 = new MovieState
-            ("HitTheLittleGuyText2.mov", "HitTheLittleGuyState", *so);
+        MovieState* hitText2 = 
+            //CreateMState("HitTheLittleGuyText2.mov", "HitTheLittleGuyState");
+            CreatePMState("HitTheLittleGuyText2.png", "HitTheLittleGuyState",9840);
 
         // 07. "Hit The Little Guy" (Simulator)
+        list<Spermatozoa*>* spermList;
+        spermList = needleHandler->InitializeSpermatazoaList(*so);
+
         HitTheLittleGuyState* hitState = new HitTheLittleGuyState
             ("HitTheLittleGuySuccessState", *so);
         hitState->SetNeedle(needleHandler);
         hitState->SetBackground(bg);
+        hitState->SetSpermatozoaList(spermList);
         
         // 08. Successfully accomplished (Video) 
-        MovieState* hitSuccessState = new MovieState
-            ("HitTheLittleGuySuccess.mov", "SelectTheLittleGuyText", *so);
+        MovieState* hitSuccessState = 
+            //CreateMState("HitTheLittleGuySuccess.mov", "SelectTheLittleGuyText");
+            CreatePMState("HitTheLittleGuySuccess.png", "SelectTheLittleGuyText",3920);
         
         // 09.
-        MovieState* selectText = new MovieState
-            ("SelectTheLittleGuyText.mov", "SelectTheLittleGuyState", *so);
+        MovieState* selectText = 
+            //CreateMState("SelectTheLittleGuyText.mov", "SelectTheLittleGuyState");
+            CreatePMState("SelectTheLittleGuyText.png", "SelectTheLittleGuyState", 8000);
 
         // 10. "Select The Little Guy" (Simulator)
         SelectState* selectState = new SelectState
             ("SelectTheLittleGuySuccessState", *so);
         selectState->SetNeedle(needleHandler);
         selectState->SetBackground(bg);
-        selectState->SetSpermatozoaList(hitState->GetSpermatozoaList());
+        selectState->SetSpermatozoaList(spermList);
         
         // 11. Successfully accomplished (Video)
-        MovieState* selectSuccessState = new MovieState
-            ("SelectTheLittleGuySuccess.mov", "TurnTheEggText", *so);
+        MovieState* selectSuccessState = 
+            //CreateMState("SelectTheLittleGuySuccess.mov", "TurnTheEggText");
+            CreatePMState("SelectTheLittleGuySuccess.png", "TurnTheEggText", 9960);
         
         // 12.
-        MovieState* turnText = new MovieState
-            ("TurnTheEggText.mov", "TurnTheEggState", *so);
+        MovieState* turnText = 
+            //CreateMState("TurnTheEggText.mov", "TurnTheEggState");
+            CreatePMState("TurnTheEggText.png", "TurnTheEggState", 6680);
         
         // 13. "Turn The Egg" (Simulator)
         TurnTheEggState* turnState = new TurnTheEggState
@@ -187,12 +236,14 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         turnState->SetBackground(bg);
         
         // 14. Successfully accomplished (Video) 
-        MovieState* turnSuccessState = new MovieState
-            ("TurnTheEggSuccess.mov", "InseminationText", *so);
+        MovieState* turnSuccessState = 
+            //CreateMState("TurnTheEggSuccess.mov", "InseminationText");
+            CreatePMState("TurnTheEggSuccess.png", "InseminationText", 10080);
         
         // 15. Insemination (Simulator)
-        MovieState* inseminateText = new MovieState
-            ("InseminationText.mov", "InseminationState", *so);
+        MovieState* inseminateText = 
+            //CreateMState("InseminationText.mov", "InseminationState");
+            CreatePMState("InseminationText.png", "InseminationState", 10000);
         
         // 16. "Insemination" (Simulator)
         InseminateState* inseminateState = new InseminateState
@@ -201,12 +252,13 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         inseminateState->SetBackground(bg);
 
         // 17. Successfully accomplished (Video)
-        MovieState* inseminateSuccessState = new MovieState
-            ("InseminationSuccess.mov", "Outro", *so);
+        MovieState* inseminateSuccessState = 
+            //CreateMState("InseminationSuccess.mov", "Outro");
+            CreatePMState("InseminationSuccess.png", "Outro", 15800);
 
         // 18. Outro (Video)
-        MovieState* outro = new MovieState
-            ("Outro.mov", "StartupPicture", *so, true);
+        MovieState* outro = 
+            CreateMState("Outro.mov", "StartupPicture", true);
 
 
         // Create and initialize StateManager
@@ -215,7 +267,6 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         sm->AddState("IntroState", introState);
         sm->AddState("DonateTextState", donateTextState);
         sm->AddState("DonateState", donateState);
-
         sm->AddState("HitTheLittleGuyText1", hitText1);
         sm->AddState("HitTheLittleGuyText2", hitText2);
         sm->AddState("HitTheLittleGuyState", hitState);

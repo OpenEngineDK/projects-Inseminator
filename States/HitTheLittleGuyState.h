@@ -5,10 +5,6 @@
 #include "Spermatozoa.h"
 #include "SimulationState.h"
 
-const float SPERM_SPEED = -0.0007f;
-const int NUM_SPERMATOZOA = 6;
-const int SEED = 0;
-
 class HitTheLittleGuyState : public SimulationState {
 private:
     list<Spermatozoa*>* spermList;
@@ -17,34 +13,22 @@ private:
 public:
  HitTheLittleGuyState(string nextState, StateObjects& so)
      : SimulationState(nextState, so) {
-        spermList = new list<Spermatozoa*>();
     }
     ~HitTheLittleGuyState() {}
-    list<Spermatozoa*>* GetSpermatozoaList() { return spermList; }
+
+    void SetSpermatozoaList(list<Spermatozoa*>* spermList) {
+        this->spermList = spermList;
+    }
 
     void Initialize() {
         SimulationState::Initialize();
 
-        srand((unsigned)SEED);
-        // Create list of spermatozoa's
-        spermList->clear();
-        for( int i=0; i<NUM_SPERMATOZOA; i++ )
-            for( int j=0; j<NUM_SPERMATOZOA; j++ ){
-	        Spermatozoa* littleGuy = new Spermatozoa(so,true);
-                float random = (rand()/(float)RAND_MAX)*10;
-                float speed = SPERM_SPEED + (SPERM_SPEED/(float)10 * (random));
-                littleGuy->SetSpeed(speed);
-                littleGuy->LoadTexture("SpermatozoaNormal-withalpha.tga");
-                // Generate random numbers between 0 and 1 with 2 digits
-                float randX = (rand()/(float)RAND_MAX);
-                float randY = (rand()/(float)RAND_MAX);
-                littleGuy->GetTransformation()->SetRotation(Quaternion<float>(Vector<3,float>(randX-0.5,randY-0.5,0).GetNormalize()));
-                littleGuy->SetPosition(Vector<3,float>(4-j+randX, 3-i+randY,-0.1));
-                root->AddNode(littleGuy->GetTransformation());
-                spermList->push_back(littleGuy);
-            }
+        list<Spermatozoa*>::iterator itr;
+        for (itr = spermList->begin(); itr!=spermList->end(); itr++)
+            root->AddNode( (*itr)->GetTransformation() );
+
         spermMarked = new Spermatozoa(so);
-        spermMarked->LoadTexture("SpermatozoaMarked-withalpha.tga");
+        spermMarked->LoadTexture("SpermatozoaMarked-withalpha.png");
         spermMarked->Kill();
         spermMarked->Mark();
      }
@@ -52,7 +36,7 @@ public:
     void Deinitialize() {
       list<Spermatozoa*>::iterator itr;
       for( itr = spermList->begin(); itr!=spermList->end(); itr++)
-	root->RemoveNode( (*itr)->GetTransformation() );
+          root->RemoveNode( (*itr)->GetTransformation() );
 
       SimulationState::Deinitialize();
     }
@@ -90,7 +74,7 @@ public:
                 Vector<3,float> newPos = pos + Vector<3,float>(dist.GetNormalize() * moveDist);
                 newPos[2] = -0.1;
                 (*itr)->SetPosition(newPos);
-                if( velocity > 0.36 && (*itr)->IsAlive() && (*itr)->IsHealthy() ){
+                if( velocity > 0.37 && (*itr)->IsAlive() && (*itr)->IsHealthy() ){
                     // Spermatozoa killed - check if it was a successful kill
                     chosenOne = (*itr);
                     chosenOne->Kill();

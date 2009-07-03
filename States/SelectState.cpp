@@ -5,6 +5,7 @@
 SelectState::SelectState(string nextState, StateObjects& so)
   : SimulationState(nextState, so) { 
         eval = false;
+        failedTextIsVisible = false;
 }
 
 SelectState::~SelectState() {}
@@ -13,23 +14,45 @@ void SelectState::Initialize() {
     SimulationState::Initialize();
     needleHandler->EnableSuck(true);
 
+    bool markedExists = false;
     list<Spermatozoa*>::iterator itr;
-    for (itr = spermList->begin(); itr!=spermList->end(); itr++)
+    for (itr = spermList->begin(); itr!=spermList->end(); itr++) {
         root->AddNode( (*itr)->GetTransformation() );
+        if ((*itr)->IsMarked())
+            markedExists = true;
+    }
+
+    if (!markedExists) {
+        Spermatozoa* spermMarked = *(spermList->begin());
+        spermList->remove(spermMarked);
+        root->RemoveNode( spermMarked->GetTransformation() );
+        Vector<3,float> position = spermMarked->GetPosition();
+        spermMarked->LoadTexture("SpermatozoaMarked-withalpha.png");
+        spermMarked->SetPosition(position);
+        spermMarked->Kill();
+        spermMarked->Mark();
+        spermList->push_back(spermMarked);
+        root->AddNode(spermMarked->GetTransformation());
+    }
 
     normalSperm = new Spermatozoa(so);
-    normalSperm->LoadTexture("SpermatozoaNormal-withalpha.tga");
+    normalSperm->LoadTexture("SpermatozoaNormal-withalpha.png");
     
     failedTexture = Billboard::
-        Create("Failed1-pustud-withalpha.tga", 128, 64, 0.07);
+        Create("Failed1-pustud-withalpha.png", 128, 64, 0.07);
     so.GetTextureLoader().Load(*failedTexture);
     failedTexture->SetPosition(Vector<3,float>(3,0,-5));
 }
 
 void SelectState::Deinitialize() {
     list<Spermatozoa*>::iterator itr;
-    for( itr = spermList->begin(); itr!=spermList->end(); itr++) {
+    for (itr = spermList->begin(); itr!=spermList->end(); itr++) {
         root->RemoveNode( (*itr)->GetTransformation() );
+    }
+
+    if (failedTextIsVisible) {
+        root->RemoveNode(failedTexture);
+        failedTextIsVisible = false;
     }
 
     SimulationState::Deinitialize();
@@ -88,6 +111,7 @@ void SelectState::Process(ProcessEventArg arg) {
 	} else {
 	    //logger.info << "You sucked up the WRONG one!" << logger.end;
 	    root->AddNode(failedTexture);
+        failedTextIsVisible = true;
 	}
     }
     if( needleHandler->GetSpermatozoa() == NULL ){
