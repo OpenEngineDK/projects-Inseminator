@@ -8,7 +8,6 @@
 //--------------------------------------------------------------------
 
 #include <Core/IModule.h>
-#include <Resources/TGAResource.h>
 #include <Resources/ITextureResource.h>
 #include <Resources/ResourceManager.h>
 #include <Renderers/TextureLoader.h>
