@@ -91,17 +91,15 @@ MovieState* Factory::CreateMState(std::string file, std::string nextState,
 
 bool Factory::SetupEngine(IEngine& engine, std::string startState) {
     try {
-        engine.InitializeEvent().Attach(*frame);
+        // Hack to avoid white flash, in window mode
+        //engine.InitializeEvent().Attach(*frame);
+        ((SDLFrame*)frame)->Handle(InitializeEventArg());
+        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        SDL_GL_SwapBuffers();
+
         engine.ProcessEvent().Attach(*frame);
         engine.DeinitializeEvent().Attach(*frame);
-
-        /*
-        // Hack to avoid white flash at startup
-        ((SDLFrame*)frame)->Handle(InitializeEventArg());
-        Vector<4,float> bgc(0.0, 0.0, 0.0, 1.0);
-        glClearColor(bgc[0], bgc[1], bgc[2], bgc[3]);
-        SDL_GL_SwapBuffers();
-        */
 
         // setup renderer
         engine.InitializeEvent().Attach(*renderer);
@@ -111,10 +109,15 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         renderer->InitializeEvent().Attach(*tl);
         renderer->PreProcessEvent().Attach(*tl);
 
+        // avoid white flashing background in the first frame
+        Vector<4,float> bgc(0.0, 0.0, 0.0, 1.0);
+        renderer->SetBackgroundColor(bgc);
+
         // Setup input handling
         SDLInput* input = new SDLInput();
         IKeyboard* keyboard = input;
         IMouse* mouse = input;
+        mouse->HideCursor();
         engine.InitializeEvent().Attach(*input);
         engine.ProcessEvent().Attach(*input);
         engine.DeinitializeEvent().Attach(*input);
