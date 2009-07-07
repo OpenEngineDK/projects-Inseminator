@@ -42,8 +42,8 @@ public:
         blendingNode->AddNode(physic);
 
         // @todo: hack for the spermatazoa to be rendered after the egg
-        needleHandler->Deinitialize();
-        needleHandler->Initialize();
+        //needleHandler->Deinitialize();
+        //needleHandler->Initialize();
 
         // initialization of physics is done by the TurnTheEggState
         timer.Start();

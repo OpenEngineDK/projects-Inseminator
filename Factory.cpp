@@ -6,7 +6,7 @@ static const int FRAME_WIDTH = 770, FRAME_HEIGHT = 450;
 static const bool FULLSCREEN = false;
 //static const bool FULLSCREEN = true;
 
-static const int RESET_TIME = 20000; // in milli seconds
+static const int RESET_TIME = 120000; // in milli seconds
 //---------------------------------------------------------
 
 #include "Factory.h"
@@ -144,6 +144,7 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
 
         RenderStateNode* rsn = new RenderStateNode();
         rsn->DisableOption(RenderStateNode::SHADER);
+        rsn->DisableOption(RenderStateNode::DEPTH_TEST);
         rsn->EnableOption(RenderStateNode::LIGHTING);
         renderer->SetSceneRoot(rsn);
 
