@@ -94,7 +94,7 @@ public:
             }
         }
 
-        if( chosenOne != NULL ){
+        if (chosenOne != NULL) {
             spermList->remove(chosenOne);
             root->RemoveNode( chosenOne->GetTransformation() );
             spermList->push_back(spermMarked);

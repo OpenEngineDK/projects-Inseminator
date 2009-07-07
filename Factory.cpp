@@ -6,13 +6,13 @@ static const int FRAME_WIDTH = 770, FRAME_HEIGHT = 450;
 static const bool FULLSCREEN = false;
 //static const bool FULLSCREEN = true;
 
-static const int RESET_TIME = 120000; // in milli seconds
 //---------------------------------------------------------
 
 #include "Factory.h"
 
 #include "PictureMovieResource.h"
 //#include "InitGLNode.h"
+#include "GlobalTimedQuitEventHandler.h"
 #include "TimedQuitEventHandler.h"
 #include "States/HUDisplay.h"
 #include "States/Background.h"
@@ -295,11 +295,22 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         engine.ProcessEvent().Attach(*sm);
         engine.DeinitializeEvent().Attach(*sm);
 
-        // global quit event handlers
-        TimedQuitEventHandler* tquit_h = 
-            new TimedQuitEventHandler(RESET_TIME,engine);
-        keyboard->KeyEvent().Attach(*tquit_h);
 
+        // global quit event handlers (timeout based)
+        GlobalTimedQuitEventHandler* gtquit_h = 
+            new GlobalTimedQuitEventHandler(120000, *so);
+        keyboard->KeyEvent().Attach(*gtquit_h);
+        mouse->MouseMovedEvent().Attach(*gtquit_h);
+        mouse->MouseButtonEvent().Attach(*gtquit_h);
+        engine.ProcessEvent().Attach(*gtquit_h);
+
+        // quit event handlers (hold down left and right arrows)
+        TimedQuitEventHandler* tquit_h = 
+            new TimedQuitEventHandler(15000, *so);
+        keyboard->KeyEvent().Attach(*tquit_h);
+        engine.ProcessEvent().Attach(*tquit_h);
+
+        // esc key quit event handlers
         QuitHandler* quit_h = new QuitHandler(engine);
         keyboard->KeyEvent().Attach(*quit_h);
 

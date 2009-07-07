@@ -37,10 +37,8 @@ public:
         BaseState::Process(arg);
 
         if (hud->Ended()) {
-            if (restart) {
-                Deinitialize();
-                so.GetEngine().Stop();
-            }
+            if (restart)
+                so.ResetSystem();
             else
                 NextState();
         }

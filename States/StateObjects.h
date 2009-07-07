@@ -40,6 +40,15 @@ class StateObjects {
     IEngine& GetEngine() { return engine; }
     TextureLoader& GetTextureLoader() { return tl; }
     HUD& GetHUD() { return hud; }
+
+    void ResetSystem() {
+        // this resets the system because the OS
+        // restarts the program when it exits
+        engine.Stop();
+
+        // old method, restart the simulator
+        //sm->ChangeState("StartupPicture");
+    }
 };
 
 #endif // _STATE_OBJECTS_

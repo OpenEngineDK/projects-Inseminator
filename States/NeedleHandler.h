@@ -25,7 +25,6 @@ using namespace OpenEngine::Resources;
 using namespace OpenEngine::Devices;
 
 static const float speed = 0.05f;
-static const float MAX_TIME = 30000.0; // in millisecs
 static const float MAX_MOUSE_SPEED = 0.36; // former 0.33
 
 // initialize spermatazoa list
@@ -35,8 +34,6 @@ const int SEED = 0;
 
 class NeedleHandler : public IState, public IListener<KeyboardEventArg> {
 private:
-    float timer;
-
     TransformationNode* needle;
     Spermatozoa* spermatozoa;
     IMouse* mus;
@@ -55,11 +52,13 @@ private:
     Spermatozoa* released;
 
 public:
- NeedleHandler(MediPhysic* mediPhysic, ISceneNode* root, IMouse* mouse, IKeyboard& keyboard, IEngine& engine, TextureLoader& textureLoader) 
-   : needle(NULL), spermatozoa(NULL), mus(mouse), keyboard(keyboard), engine(engine), rootNode(root), textureLoader(textureLoader), 
-          lx(0), ly(0), init(true), left(false), right(false),  released(NULL) {
+ NeedleHandler(MediPhysic* mediPhysic, ISceneNode* root, IMouse* mouse,
+               IKeyboard& keyboard, IEngine& engine,
+               TextureLoader& textureLoader) 
+   : needle(NULL), spermatozoa(NULL), mus(mouse), keyboard(keyboard),
+        engine(engine), rootNode(root), textureLoader(textureLoader), 
+        lx(0), ly(0), init(true), left(false), right(false),  released(NULL) {
 
-        timer = 0.0f;
         suckEnabled = false;
 
         // Load Needle model
@@ -67,7 +66,7 @@ public:
             ResourceManager<IModelResource>::Create("Needle.obj");
         mod->Load();
         if (mod->GetSceneNode() == NULL)
-            logger.error << "Loading needle obj file failed - FaceSet is empty!" << logger.end;
+            logger.error << "Loading needle obj file failed" << logger.end;
         ISceneNode* gNode = mod->GetSceneNode();
         mod->Unload();
 
@@ -125,6 +124,11 @@ public:
     void EnableSuck(bool b) {suckEnabled = b;}
 
     void Initialize() {
+        mus->SetCursor(400, 300);
+        s = mus->GetState();
+        lx = s.x;
+        ly = s.y;
+
         suckEnabled = false;
         init = true;
 
@@ -153,14 +157,6 @@ public:
     }
 
     void Process(ProcessEventArg arg) {
-        float deltaTime = arg.approx / 1000.0;
-        timer += deltaTime;
-        if (timer > MAX_TIME) {
-            timer = 0;
-            logger.info << "timout off " << MAX_TIME << " mSec, simulator was restarted" << logger.end;
-            engine.Stop();
-        }
-
         // Handle events
         HandleMouse();
         HandleKeys();
@@ -251,13 +247,11 @@ public:
                 if (pos[0] < 4.50f) // max to the left
 				pos[0] += speed;
 				spermatozoa->SetPosition(pos);
-                timer = 0.0f;
 			}
             if (right && suckEnabled) {
 				Vector<3,float> pos = spermatozoa->GetPosition();
                 pos[0] -= speed;
 				spermatozoa->SetPosition(pos);
-                timer = 0.0f;
 			}
 
             // move spermaozoa billboard
@@ -285,27 +279,11 @@ public:
     }
 
     void HandleMouse(){
-        // on the first process we need to set the mouse and use the set
-        // values as the current mouse state. If not we give rise to a
-        // race condition where the mouse state will depend on the order
-        // that this module and the IMouse module have been added to the
-        // engine.
-        if (init) {
-            init = false;
-            mus->SetCursor(400,300);
-            s.x = lx = 400;
-            s.y = ly = 300;
-            s.buttons = BUTTON_NONE; //@todo: not initialized
-        } else {
-            s = mus->GetState();
-        }
+        s = mus->GetState();
 
         // compute rotate difference
         dx = lx - s.x; // moving mouse up = positive value
         dy = ly - s.y; // moving to the left = positive value
-
-        if (dx != 0 || dy != 0)
-            timer = 0; // renew timer
 
         // reset the position
         if (abs(s.x - 400) > 100 || abs(s.y - 300) > 100) {
@@ -320,9 +298,9 @@ public:
 
     void Handle(KeyboardEventArg arg) {
       if (arg.type == EVENT_PRESS)
-	  KeyDown(arg);
+          KeyDown(arg);
       else
-	  KeyUp(arg);
+          KeyUp(arg);
     }
 
     void KeyDown(KeyboardEventArg arg) {

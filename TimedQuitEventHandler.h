@@ -1,6 +1,8 @@
 #ifndef _TIMED_QUIT_EVENT_HANDLER_
 #define _TIMED_QUIT_EVENT_HANDLER_
 
+#include "States/StateObjects.h"
+
 #include <Core/IEngine.h>
 #include <Devices/IKeyboard.h>
 #include <Devices/Symbols.h>
@@ -11,29 +13,16 @@ using namespace OpenEngine::Devices;
 class TimedQuitEventHandler : public IListener<ProcessEventArg>
 , public IListener<KeyboardEventArg>  {
 private:
+    StateObjects& so;
     double timePast;
     bool left, right;
     int RESET_TIME;
-    IEngine& engine;
-
-    void ResetSystem() {
-      /* this resets the system because the OS
-	 restarts the program when it exits */
-      engine.Stop();
-
-      /*
-	// old method
-	GameStateManager* gsm = dynamic_cast<GameStateManager*>
-	  (IGameEngine::Instance().Lookup(typeid(GameStateManager)));
-	gsm->ChangeState("StartupPicture"); // restart the simulator
-      */
-    }
 
 public:
-   TimedQuitEventHandler(int resetTime, IEngine& engine) : engine(engine) {
-      timePast = 0.0f;
-      left = right = false;
-      RESET_TIME = resetTime;
+ TimedQuitEventHandler(int resetTime, StateObjects& so) : so(so) {
+        timePast = 0.0f;
+        left = right = false;
+        RESET_TIME = resetTime;
     }
 
     void Handle(ProcessEventArg arg) {
@@ -44,28 +33,28 @@ public:
             timePast = 0.0f;
 
         if (timePast > RESET_TIME)
-            ResetSystem();
+            so.ResetSystem();
     }
 
     void Handle(KeyboardEventArg arg) {
         if (arg.type == EVENT_PRESS)
-	  HandleDownEvent(arg);
-      else
-	  HandleUpEvent(arg);
+            HandleDownEvent(arg);
+        else
+            HandleUpEvent(arg);
     }
 
     void HandleUpEvent(KeyboardEventArg arg) {
-      if (arg.sym == KEY_LEFT)
-	left = false;
-      else if (arg.sym == KEY_RIGHT)
-	right = false;
+        if (arg.sym == KEY_LEFT)
+            left = false;
+        else if (arg.sym == KEY_RIGHT)
+            right = false;
     }
 
     void HandleDownEvent(KeyboardEventArg arg) {
-      if (arg.sym == KEY_LEFT)
-	left = true;
-      else if (arg.sym == KEY_RIGHT)
-	right = true;
+        if (arg.sym == KEY_LEFT)
+            left = true;
+        else if (arg.sym == KEY_RIGHT)
+            right = true;
     }
 };
 
