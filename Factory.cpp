@@ -68,8 +68,8 @@ using namespace OpenEngine::Utils;
 
 MovieState* Factory::CreatePMState(std::string file, std::string nextState, 
                                    float duration) {
-        ITextureResourcePtr donateTextStateTexture = 
-            ResourceManager<ITextureResource>::Create(file);
+        ITexture2DPtr donateTextStateTexture = 
+            ResourceManager<ITexture2D>::Create(file);
         donateTextStateTexture->Load();
         IMovieResourcePtr donateTextStateMovie = IMovieResourcePtr
             (new PictureMovieResource(donateTextStateTexture ,duration));
@@ -136,7 +136,7 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         
         // load the resource plug-ins
         ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
-        ResourceManager<ITextureResource>::AddPlugin(new SDLImagePlugin());
+        ResourceManager<ITexture2D>::AddPlugin(new SDLImagePlugin());
         ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
 
         HUD* hud = new HUD(FRAME_WIDTH, FRAME_HEIGHT);

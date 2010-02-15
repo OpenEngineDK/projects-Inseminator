@@ -7,13 +7,13 @@ using namespace OpenEngine::Resources;
 
 class PictureMovieResource : public IMovieResource {
  private:
-    ITextureResourcePtr tex;
+    ITexture2DPtr tex;
     bool paused;
     double time, duration;
     
  public:
-    PictureMovieResource(ITextureResourcePtr t, float d) 
-        : ITextureResource() {
+    PictureMovieResource(ITexture2DPtr t, float d) 
+        : Texture2D<unsigned char>() {
         tex = t;
         duration = d;
         Restart();
@@ -47,7 +47,7 @@ class PictureMovieResource : public IMovieResource {
         this->id = tex->GetID();
         this->channels = tex->GetChannels();
         this->format = tex->GetColorFormat();
-        this->data = (unsigned char*) tex->GetVoidDataPtr();
+        this->data = tex->GetVoidDataPtr();
         this->mipmapping = tex->UseMipmapping();
         this->height = tex->GetHeight();
         this->width = tex->GetWidth();

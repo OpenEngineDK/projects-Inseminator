@@ -36,8 +36,8 @@ void SimulationState::Initialize() {
     needleHandler->Initialize();
 
     // Load texture
-    ITextureResourcePtr texture =
-        ResourceManager<ITextureResource>::Create("MicroHUD-reverted-withalpha.png"); 
+    ITexture2DPtr texture =
+        ResourceManager<ITexture2D>::Create("MicroHUD-reverted-withalpha.png"); 
     so.GetTextureLoader().Load(texture);
     
     HUD& hud = so.GetHUD();

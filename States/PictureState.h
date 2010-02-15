@@ -31,8 +31,8 @@ public:
 
     virtual void Initialize() {
         // Load texture
-        ITextureResourcePtr texture =
-            ResourceManager<ITextureResource>::Create(pictureName); 
+        ITexture2DPtr texture =
+            ResourceManager<ITexture2D>::Create(pictureName); 
         so.GetTextureLoader().Load(texture);
         hud = new HUDisplay(texture);
 

@@ -18,7 +18,7 @@ HUDisplay::HUDisplay(unsigned int width, unsigned int height) : textureId(0) {
     fade = 1.0f;
 }
 
-HUDisplay::HUDisplay(ITextureResourcePtr texture) : fade(1.0f) {
+HUDisplay::HUDisplay(ITexture2DPtr texture) : fade(1.0f) {
     SCREEN_WIDTH = texture->GetWidth(); // = 1280;
     SCREEN_HEIGHT = texture->GetHeight(); // = 600;
     textureId = texture->GetID();

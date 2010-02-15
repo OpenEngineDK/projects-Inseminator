@@ -13,7 +13,7 @@
 #include <Core/EngineEvents.h>
 #include <Scene/RenderNode.h>
 #include <Renderers/IRenderingView.h>
-#include <Resources/ITextureResource.h>
+#include <Resources/ITexture2D.h>
 
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Resources;
@@ -30,7 +30,7 @@ protected:
     float fade, maxX, maxY;
 public:
     HUDisplay(unsigned int width, unsigned int height);
-    HUDisplay(ITextureResourcePtr texture);
+    HUDisplay(ITexture2DPtr texture);
     ~HUDisplay();
 
     void Apply(IRenderingView* rende);
