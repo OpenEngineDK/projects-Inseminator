@@ -12,10 +12,12 @@ class PictureMovieResource : public IMovieResource {
     double time, duration;
     
  public:
-    PictureMovieResource(ITextureResourcePtr t, float d) {
+    PictureMovieResource(ITextureResourcePtr t, float d) 
+        : ITextureResource() {
         tex = t;
         duration = d;
         Restart();
+        Load();
     }
     ~PictureMovieResource() {}
 
@@ -28,7 +30,6 @@ class PictureMovieResource : public IMovieResource {
     }
     unsigned int GetMovieHeight() { return tex->GetHeight(); }
     unsigned int GetMovieWidth() { return tex->GetWidth(); }
-    ColorFormat GetColorFormat() { return tex->GetColorFormat(); }
 
     // from IModule
     virtual void Handle(InitializeEventArg arg){}
@@ -41,16 +42,20 @@ class PictureMovieResource : public IMovieResource {
     }
 
     // from IResource
-    virtual void Load(){}
+    virtual void Load(){
+        tex->Load();
+        this->id = tex->GetID();
+        this->channels = tex->GetChannels();
+        this->format = tex->GetColorFormat();
+        this->data = (unsigned char*) tex->GetVoidDataPtr();
+        this->mipmapping = tex->UseMipmapping();
+        this->height = tex->GetHeight();
+        this->width = tex->GetWidth();
+    }
     virtual void Unload(){}
 
     // from TextureResource
-    int GetID() { return tex->GetID(); }
-    void SetID(int id) { tex->SetID(id); }
-    unsigned int GetHeight() { return tex->GetHeight(); }
-    unsigned int GetWidth() { return tex->GetWidth(); }
-    unsigned int GetDepth() { return tex->GetDepth(); }
-    unsigned char* GetData() { return tex->GetData(); }
+    void SetID(int id) { this->id = id; tex->SetID(id); }
 };
 
 #endif // _PICTURE_MOVIE_RESOURCE_
