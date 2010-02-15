@@ -353,7 +353,7 @@ Factory::Factory() {
     renderer = new Renderer(viewport);
     // Add a rendering view to the renderer
     renderer->ProcessEvent().Attach(*(new RenderingView(*viewport)));
-    renderer->PreProcessEvent().Attach(*(new LightRenderer(*camera)));
+    renderer->PreProcessEvent().Attach(*(new LightRenderer(*viewport)));
 }
 
 Factory::~Factory() {
