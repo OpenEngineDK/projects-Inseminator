@@ -156,7 +156,7 @@ public:
         keyboard.KeyEvent().Detach(*this);
     }
 
-    void Process(ProcessEventArg arg) {
+    void Process(Core::ProcessEventArg arg) {
         // Handle events
         HandleMouse();
         HandleKeys();

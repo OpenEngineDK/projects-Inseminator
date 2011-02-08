@@ -25,8 +25,8 @@ HUDMovie::~HUDMovie() {}
 
 void HUDMovie::Initialize() {
     // sets the texid if not already there
-    ((boost::shared_ptr<IListener<InitializeEventArg> >)
-     mplayer)->Handle(InitializeEventArg());
+    ((boost::shared_ptr<IListener<Core::InitializeEventArg> >)
+     mplayer)->Handle(Core::InitializeEventArg());
 
     so.GetTextureLoader().Load( mplayer, TextureLoader::RELOAD_IMMEDIATE );    
     mplayer->Restart();
@@ -42,15 +42,15 @@ using namespace OpenEngine::Resources;
 void HUDMovie::Deinitialize() {
     mplayer->Pause(true);
 
-    ((boost::shared_ptr<IListener<DeinitializeEventArg> >)
-     mplayer)->Handle(DeinitializeEventArg());
+    ((boost::shared_ptr<IListener<Core::DeinitializeEventArg> >)
+     mplayer)->Handle(Core::DeinitializeEventArg());
 }
 
-void HUDMovie::Process(ProcessEventArg arg) {
+void HUDMovie::Process(Core::ProcessEventArg arg) {
     this->textureId = mplayer->GetID();
     if(mplayer->Ended()) endRequested = true;
     HUDisplay::Process(arg);
     
-    ((boost::shared_ptr<IListener<ProcessEventArg> >)
+    ((boost::shared_ptr<IListener<Core::ProcessEventArg> >)
      mplayer)->Handle(arg);
 }

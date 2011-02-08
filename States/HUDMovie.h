@@ -29,7 +29,7 @@ public:
     ~HUDMovie();
 
     // Only for processing the movie decoding
-    void Process(ProcessEventArg arg);
+    void Process(Core::ProcessEventArg arg);
 
     void Initialize();
     void Deinitialize();

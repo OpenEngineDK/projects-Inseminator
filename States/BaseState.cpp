@@ -24,7 +24,7 @@ void BaseState::Deinitialize() {
 }
 
     
-void BaseState::Process(ProcessEventArg arg) {
+void BaseState::Process(Core::ProcessEventArg arg) {
 }
 
 void BaseState::NextState() {

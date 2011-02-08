@@ -122,7 +122,7 @@ void HUDisplay::ApplyOrthoView(){
     glLoadIdentity();
 }
 
-void HUDisplay::Process(ProcessEventArg arg) {
+void HUDisplay::Process(Core::ProcessEventArg arg) {
     float delta = arg.approx / 1000.0;
 
     float blendFactor = 0.001;

@@ -16,7 +16,7 @@ public:
 
     void Initialize();
     void Deinitialize();
-    void Process(ProcessEventArg arg);
+    void Process(Core::ProcessEventArg arg);
 
     void CheckCollision();
     void SetSpermatozoaList(list<Spermatozoa*>* s);

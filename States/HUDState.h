@@ -33,7 +33,7 @@ public:
         BaseState::Deinitialize();
     }
 
-    virtual void Process(ProcessEventArg arg) {
+    virtual void Process(Core::ProcessEventArg arg) {
         BaseState::Process(arg);
 
         if (hud->Ended()) {

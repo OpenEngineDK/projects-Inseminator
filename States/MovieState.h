@@ -37,7 +37,7 @@ public:
         movie->Deinitialize();
     }
 
-    virtual void Process(ProcessEventArg arg){
+    virtual void Process(Core::ProcessEventArg arg){
         HUDState::Process(arg);
         movie->Process(arg);
     }

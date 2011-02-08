@@ -26,6 +26,7 @@ static const bool FULLSCREEN = false;
 #include "States/NeedleHandler.h"
 
 #include <Display/Frustum.h>
+#include <Display/Viewport.h>
 #include <Display/ViewingVolume.h>
 #include <Display/SDLFrame.h>
 #include <Display/Camera.h>
@@ -93,7 +94,7 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
     try {
         // Hack to avoid white flash, in window mode
         //engine.InitializeEvent().Attach(*frame);
-        ((SDLFrame*)frame)->Handle(InitializeEventArg());
+        ((SDLFrame*)frame)->Handle(Core::InitializeEventArg());
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         SDL_GL_SwapBuffers();
@@ -338,7 +339,7 @@ Factory::Factory() {
       options = FRAME_FULLSCREEN;
 
     frame    = new SDLFrame(FRAME_WIDTH, FRAME_HEIGHT, 32, options);
-    viewport = new Viewport(*frame);
+    viewport = new Display::Viewport(*frame);
         
     camera = new Camera(*(new ViewingVolume()));
     camera->SetPosition(Vector<3,float>(3,0,-15));

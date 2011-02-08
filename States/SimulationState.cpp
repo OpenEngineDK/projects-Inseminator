@@ -63,7 +63,7 @@ void SimulationState::Deinitialize() {
     needleHandler->Deinitialize(); //??? deinit again?
 }
 
-void SimulationState::Process(ProcessEventArg arg) {
+void SimulationState::Process(Core::ProcessEventArg arg) {
     bg->Process(arg);
     needleHandler->Process(arg);
 

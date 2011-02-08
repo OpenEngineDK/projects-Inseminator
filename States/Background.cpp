@@ -38,7 +38,7 @@ void Background::Deinitialize(){
     root->RemoveNode(background);
 }
 
-void Background::Process(ProcessEventArg arg) {
+void Background::Process(Core::ProcessEventArg arg) {
     /* @todo: old lets overs, remove Process method
 
     // Update the movement of the noisy crap

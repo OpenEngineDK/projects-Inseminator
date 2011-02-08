@@ -10,7 +10,7 @@
 using OpenEngine::Core::IEngine;
 using namespace OpenEngine::Devices;
 
-class TimedQuitEventHandler : public IListener<ProcessEventArg>
+class TimedQuitEventHandler : public IListener<Core::ProcessEventArg>
 , public IListener<KeyboardEventArg>  {
 private:
     StateObjects& so;
@@ -25,7 +25,7 @@ public:
         RESET_TIME = resetTime;
     }
 
-    void Handle(ProcessEventArg arg) {
+    void Handle(Core::ProcessEventArg arg) {
         float deltaTime = arg.approx/1000.0;
         if (left && right)
             timePast += deltaTime;

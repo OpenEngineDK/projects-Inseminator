@@ -47,7 +47,7 @@ public:
         // insert the physics node into and initialize timer
         root->AddNode(blendingNode);
         blendingNode->AddNode(physic);
-        physic->Handle(InitializeEventArg());
+        physic->Handle(Core::InitializeEventArg());
         timer.Start();
 
         // if needle does not have a spermatazoa, add one
@@ -75,7 +75,7 @@ public:
         SimulationState::Deinitialize();
     }
 
-    void Process(ProcessEventArg arg) {
+    void Process(Core::ProcessEventArg arg) {
         SimulationState::Process(arg);
 
         Vector<3,float> dir1 = physic->GetOrientationVector(22);
@@ -108,7 +108,7 @@ public:
         // process physics time dependend
         const unsigned int tick = 50;
         unsigned int t = timer.GetElapsedIntervalsAndReset(tick*1000);
-        while (t--) physic->Handle(ProcessEventArg(arg.start,tick*1000));
+        while (t--) physic->Handle(Core::ProcessEventArg(arg.start,tick*1000));
 
         if (stateClock > 10000 && !infoTextIsVisible) {
             root->AddNode(infoTexture);

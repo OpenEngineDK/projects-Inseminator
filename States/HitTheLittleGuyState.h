@@ -41,7 +41,7 @@ public:
       SimulationState::Deinitialize();
     }
 
-    void Process(ProcessEventArg arg) {
+    void Process(Core::ProcessEventArg arg) {
         float delta = arg.approx / 1000.0;
         // Update all spermatozoas
         list<Spermatozoa*>::iterator itr;

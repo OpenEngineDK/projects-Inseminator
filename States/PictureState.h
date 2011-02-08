@@ -44,7 +44,7 @@ public:
         HUDState::Deinitialize();
     }
 
-    virtual void Process(ProcessEventArg arg) {
+    virtual void Process(Core::ProcessEventArg arg) {
         //wait for mouse movement to go to the next state
         MouseState currentMouseState = mouse->GetState();
         if(initMouseState.x==0 && initMouseState.y == 0) {

@@ -38,7 +38,7 @@ public:
 
         // insert the physics node into and initialize timer
         root->AddNode(blendingNode);
-        physic->Handle(InitializeEventArg());
+        physic->Handle(Core::InitializeEventArg());
         blendingNode->AddNode(physic);
 
         // @todo: hack for the spermatazoa to be rendered after the egg
@@ -80,12 +80,12 @@ public:
 
         if (physic->transNode != NULL)
             root->RemoveNode(physic->transNode);
-        physic->Handle(DeinitializeEventArg());
+        physic->Handle(Core::DeinitializeEventArg());
 
         SimulationState::Deinitialize();
     }
 
-    void Process(ProcessEventArg arg) {
+    void Process(Core::ProcessEventArg arg) {
         float delta = arg.approx / 1000.0;
 
         // Check if we the injecting went well
@@ -114,7 +114,7 @@ public:
         // process physics time dependend
         const unsigned int tick = 50;
         unsigned int t = timer.GetElapsedIntervalsAndReset(tick*1000);
-        while (t--) physic->Handle(ProcessEventArg(arg.start,tick*1000));
+        while (t--) physic->Handle(Core::ProcessEventArg(arg.start,tick*1000));
 
         SimulationState::Process(arg);
     }

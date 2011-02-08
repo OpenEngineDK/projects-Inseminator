@@ -58,7 +58,7 @@ void SelectState::Deinitialize() {
     SimulationState::Deinitialize();
 }
 
-void SelectState::Process(ProcessEventArg arg) {
+void SelectState::Process(Core::ProcessEventArg arg) {
     float delta = arg.approx / 1000.0;
 
     SimulationState::Process(arg);

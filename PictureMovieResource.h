@@ -32,9 +32,9 @@ class PictureMovieResource : public IMovieResource {
     unsigned int GetMovieWidth() { return tex->GetWidth(); }
 
     // from IModule
-    virtual void Handle(InitializeEventArg arg){}
-    virtual void Handle(DeinitializeEventArg arg){}
-    virtual void Handle(ProcessEventArg arg){
+    virtual void Handle(Core::InitializeEventArg arg){}
+    virtual void Handle(Core::DeinitializeEventArg arg){}
+    virtual void Handle(Core::ProcessEventArg arg){
         float dt = arg.approx / 1000.0;
 
         if (paused || Ended()) return;

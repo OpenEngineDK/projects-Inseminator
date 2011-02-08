@@ -10,7 +10,7 @@
 using OpenEngine::Core::IEngine;
 using namespace OpenEngine::Devices;
 
-class GlobalTimedQuitEventHandler : public IListener<ProcessEventArg>
+class GlobalTimedQuitEventHandler : public IListener<Core::ProcessEventArg>
 , public IListener<KeyboardEventArg>, public IListener<MouseMovedEventArg>
     , public IListener<MouseButtonEventArg> {
 private:
@@ -25,7 +25,7 @@ public:
         RESET_TIME = resetTime;
     }
 
-    void Handle(ProcessEventArg arg) {
+    void Handle(Core::ProcessEventArg arg) {
         float deltaTime = arg.approx/1000.0;
         timePast += deltaTime;
 

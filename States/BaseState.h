@@ -8,14 +8,14 @@
 
 #include "StateObjects.h"
 
-using std::string;
+using namespace OpenEngine;
 using OpenEngine::Core::IState;
 using OpenEngine::Core::StateManager;
 using OpenEngine::Scene::ISceneNode;
 
 class BaseState : public IState {
 private:
-    string nextState;
+    std::string nextState;
     StateManager* sm;
 protected:
     StateObjects& so;
@@ -26,7 +26,7 @@ protected:
 public:
     virtual void Initialize();
     virtual void Deinitialize();
-    virtual void Process(ProcessEventArg arg);
+    virtual void Process(Core::ProcessEventArg arg);
     void NextState();
 };
 

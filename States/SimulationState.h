@@ -11,6 +11,7 @@
 #include <Core/IListener.h>
 #include <Devices/IKeyboard.h>
 #include <Renderers/IRenderer.h>
+#include <Scene/PointLightNode.h>
 
 using OpenEngine::Core::IListener;
 using namespace OpenEngine::Devices;
@@ -20,7 +21,7 @@ class SimulationState : public BaseState, public IListener<KeyboardEventArg> {
 private:
     float time;
     float fadeTime;
-    LightNode* light;
+    Scene::PointLightNode* light;
     TransformationNode* lightPosition;
 
 protected:
@@ -34,7 +35,7 @@ public:
     SimulationState(string nextState, StateObjects& so);
     void Initialize();
     void Deinitialize();
-    void Process(ProcessEventArg arg);
+    void Process(Core::ProcessEventArg arg);
     void SetNeedle(NeedleHandler* needle);
     void SetBackground(Background* bg);
     void Handle(KeyboardEventArg arg);

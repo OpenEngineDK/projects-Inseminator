@@ -16,6 +16,7 @@
 #include <list>
 
 using std::list;
+using namespace OpenEngine;
 using OpenEngine::Core::IState;
 using OpenEngine::Scene::TransformationNode;
 using OpenEngine::Scene::ISceneNode;
@@ -33,7 +34,7 @@ public:
 
     void Initialize();
     void Deinitialize();
-    void Process(ProcessEventArg arg);
+    void Process(Core::ProcessEventArg arg);
 };
 
 #endif

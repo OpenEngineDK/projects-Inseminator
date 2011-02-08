@@ -15,6 +15,7 @@
 #include <Renderers/IRenderingView.h>
 #include <Resources/ITexture2D.h>
 
+using namespace OpenEngine;
 using namespace OpenEngine::Core;
 using namespace OpenEngine::Resources;
 using namespace OpenEngine::Renderers;
@@ -44,7 +45,7 @@ public:
     bool Ended();
     void FadeDown();
     void Blend(bool blend);
-    void Process(ProcessEventArg arg);
+    void Process(Core::ProcessEventArg arg);
 };
 
 #endif
