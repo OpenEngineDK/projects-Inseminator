@@ -34,7 +34,7 @@ public:
     HUDisplay(ITexture2DPtr texture);
     ~HUDisplay();
 
-    void Apply(IRenderingView* rende);
+    void Apply(Renderers::RenderingEventArg arg, ISceneNodeVisitor& v);
 
     // Override this for special use
     virtual void DrawInOrthoMode();

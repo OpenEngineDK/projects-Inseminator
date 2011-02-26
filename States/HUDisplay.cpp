@@ -35,7 +35,7 @@ HUDisplay::HUDisplay(ITexture2DPtr texture) : fade(1.0f) {
 HUDisplay::~HUDisplay(){
 }
 
-void HUDisplay::Apply(IRenderingView* rende) {
+void HUDisplay::Apply(Renderers::RenderingEventArg arg, ISceneNodeVisitor& v) {
     /*
     if (blend) { // used for Microscope view
         // Blend options
@@ -96,7 +96,7 @@ void HUDisplay::DrawInOrthoMode() {
     glEnd();
 }
 
-void HUDisplay::ApplyOrthoView(){
+void HUDisplay::ApplyOrthoView() {
     CHECK_FOR_GL_ERROR();
     glPushMatrix();
     glMatrixMode(GL_PROJECTION);

@@ -30,11 +30,13 @@ static const bool FULLSCREEN = false;
 #include <Display/ViewingVolume.h>
 #include <Display/SDLFrame.h>
 #include <Display/Camera.h>
+#include <Display/RenderCanvas.h>
 #include <Devices/SDLInput.h>
 
 #include <Renderers/OpenGL/LightRenderer.h>
 #include <Renderers/OpenGL/Renderer.h>
 #include <Renderers/OpenGL/RenderingView.h>
+#include <Display/OpenGL/TextureCopy.h>
 
 #include <Resources/DirectoryManager.h>
 #include <Resources/ResourceManager.h>
@@ -92,6 +94,36 @@ MovieState* Factory::CreateMState(std::string file, std::string nextState,
 
 bool Factory::SetupEngine(IEngine& engine, std::string startState) {
     try {
+        string resourcedir = "./projects/Inseminator/data/";
+        logger.info << "Resource directory: " << resourcedir << logger.end;
+        string modeldir = resourcedir + "models/";
+        DirectoryManager::AppendPath(modeldir);
+        string billboardsdir = resourcedir + "billboards/";
+        DirectoryManager::AppendPath(billboardsdir);
+        string moviesdir = resourcedir + "movies/";
+        DirectoryManager::AppendPath(moviesdir);
+        string picturemoviesdir = resourcedir + "picturemovies/";
+        DirectoryManager::AppendPath(picturemoviesdir);
+
+        // load the resource plug-ins
+        ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
+        ResourceManager<ITexture2D>::AddPlugin(new SDLImagePlugin());
+        ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
+
+        HUD* hud = new HUD(FRAME_WIDTH, FRAME_HEIGHT);
+        renderer->PostProcessEvent().Attach(*hud);
+
+        RenderStateNode* rsn = new RenderStateNode();
+        rsn->DisableOption(RenderStateNode::SHADER);
+        rsn->DisableOption(RenderStateNode::DEPTH_TEST);
+        rsn->EnableOption(RenderStateNode::LIGHTING);
+
+        RenderCanvas* canvas = new RenderCanvas(new Display::OpenGL::TextureCopy());
+        canvas->SetViewingVolume(camera);
+        canvas->SetScene(rsn);
+        canvas->SetRenderer(renderer);
+        frame->SetCanvas(canvas);
+
         // Hack to avoid white flash, in window mode
         //engine.InitializeEvent().Attach(*frame);
         ((SDLFrame*)frame)->Handle(Core::InitializeEventArg());
@@ -103,9 +135,6 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         engine.DeinitializeEvent().Attach(*frame);
 
         // setup renderer
-        engine.InitializeEvent().Attach(*renderer);
-        engine.ProcessEvent().Attach(*renderer);
-        engine.DeinitializeEvent().Attach(*renderer);
         TextureLoader* tl = new TextureLoader(*renderer);
         renderer->InitializeEvent().Attach(*tl);
         renderer->PreProcessEvent().Attach(*tl);
@@ -123,31 +152,6 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
         engine.ProcessEvent().Attach(*input);
         engine.DeinitializeEvent().Attach(*input);
 
-
-        string resourcedir = "./projects/Inseminator/data/";
-        logger.info << "Resource directory: " << resourcedir << logger.end;
-        string modeldir = resourcedir + "models/";
-        DirectoryManager::AppendPath(modeldir);
-        string billboardsdir = resourcedir + "billboards/";
-        DirectoryManager::AppendPath(billboardsdir);
-        string moviesdir = resourcedir + "movies/";
-        DirectoryManager::AppendPath(moviesdir);
-        string picturemoviesdir = resourcedir + "picturemovies/";
-        DirectoryManager::AppendPath(picturemoviesdir);
-        
-        // load the resource plug-ins
-        ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
-        ResourceManager<ITexture2D>::AddPlugin(new SDLImagePlugin());
-        ResourceManager<IMovieResource>::AddPlugin(new FFMPEGPlugin());
-
-        HUD* hud = new HUD(FRAME_WIDTH, FRAME_HEIGHT);
-        renderer->PostProcessEvent().Attach(*hud);
-
-        RenderStateNode* rsn = new RenderStateNode();
-        rsn->DisableOption(RenderStateNode::SHADER);
-        rsn->DisableOption(RenderStateNode::DEPTH_TEST);
-        rsn->EnableOption(RenderStateNode::LIGHTING);
-        renderer->SetSceneRoot(rsn);
 
         // Create scene root
         BlendingNode* root = new BlendingNode();
@@ -335,8 +339,8 @@ bool Factory::SetupEngine(IEngine& engine, std::string startState) {
 
 Factory::Factory() {
     FrameOption options = FrameOption();
-    if(FULLSCREEN)
-      options = FRAME_FULLSCREEN;
+    if (FULLSCREEN)
+        options = FRAME_FULLSCREEN;
 
     frame    = new SDLFrame(FRAME_WIDTH, FRAME_HEIGHT, 32, options);
     viewport = new Display::Viewport(*frame);
@@ -351,10 +355,10 @@ Factory::Factory() {
     //frustum->SetFar(1000);
     viewport->SetViewingVolume(frustum);
       
-    renderer = new Renderer(viewport);
+    renderer = new Renderer();
     // Add a rendering view to the renderer
-    renderer->ProcessEvent().Attach(*(new RenderingView(*viewport)));
-    renderer->PreProcessEvent().Attach(*(new LightRenderer(*viewport)));
+    renderer->ProcessEvent().Attach(*(new RenderingView()));
+    renderer->PreProcessEvent().Attach(*(new LightRenderer()));
 }
 
 Factory::~Factory() {
